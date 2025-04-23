@@ -270,14 +270,9 @@ namespace PgBackupRestoreTool
         // -------------------------------------------------------
         private string GetHost()
         {
-            if (radioLocal.Checked)
-            {
-                return "localhost";
-            }
-            else
-            {
-                return comboBoxHost.Text.Trim();
-            }
+            return radioLocal.Checked
+                ? "localhost"
+                : comboBoxHost.Text.Trim();
         }
 
         // -------------------------------------------------------
@@ -297,19 +292,21 @@ namespace PgBackupRestoreTool
             string host = GetHost();
             string port = textBoxPort.Text.Trim();
 
-            // pg_dump -U <user> -h <host> -p <port> [-F c] -f "filePath" <db>
+            // pg_dump -U <user> -h <host> -p <port> [-F c] [-C] -f "filePath" <db>
             string arguments = $"-U {PG_USER} -h {host} -p {port} ";
             if (isCustom)
             {
+                // Custom binary format
                 arguments += $"-F c -f \"{filePath}\" ";
             }
             else
             {
-                arguments += $"-f \"{filePath}\" ";
+                // Plain SQL + --create: 包含 CREATE DATABASE / \connect
+                arguments += $"-C -f \"{filePath}\" ";
             }
             arguments += PG_DATABASE;
 
-            Log($"Starting backup ({(isCustom ? "Custom format" : "Plain SQL")})...");
+            Log($"Starting backup ({(isCustom ? "Custom format" : "Plain SQL with create")})...");
             Log($"Command: pg_dump {arguments}");
 
             await RunProcessAsync("pg_dump", arguments);
@@ -433,8 +430,7 @@ namespace PgBackupRestoreTool
         }
 
         /// <summary>
-        /// 僅用於「Test Connection」，判斷 exit code == 0 即成功。  
-        /// 不輸出詳細日誌，只在失敗時簡短顯示錯誤訊息。
+        /// 僅用於「Test Connection」，判斷 exit code == 0 即成功。
         /// </summary>
         private async Task<bool> RunProcessAndCheckSuccess(string fileName, string arguments)
         {
@@ -462,20 +458,15 @@ namespace PgBackupRestoreTool
                         process.StartInfo = psi;
                         process.Start();
 
-                        string output = process.StandardOutput.ReadToEnd();
+                        process.StandardOutput.ReadToEnd();
                         string error = process.StandardError.ReadToEnd();
                         process.WaitForExit();
 
-                        // exitCode == 0 視為成功
                         result = (process.ExitCode == 0);
 
-                        if (!result)
+                        if (!result && !string.IsNullOrEmpty(error))
                         {
-                            // 簡短顯示錯誤到日誌（若有）
-                            if (!string.IsNullOrEmpty(error))
-                            {
-                                Log($"[TestConnection Error]: {error.Trim()}");
-                            }
+                            Log($"[TestConnection Error]: {error.Trim()}");
                         }
                     }
                 }
