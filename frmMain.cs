@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -39,6 +40,15 @@ namespace PgBackupRestoreTool
         public frmMain()
         {
             InitializeComponent();
+
+            string fullVersion = Assembly.GetExecutingAssembly()
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion ?? "unknown";
+
+            // 只取 "+" 前的部分
+            string displayVersion = fullVersion.Split('+')[0];
+
+            this.Text = $"PostgreSQL Backup/Restore Tool v{displayVersion}";
 
             // 讀取外部檔 (若無則建空檔)
             LoadConfig();
