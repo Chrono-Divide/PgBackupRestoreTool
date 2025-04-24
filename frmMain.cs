@@ -47,15 +47,13 @@ namespace PgBackupRestoreTool
             radioLocal.Checked = true;
             textBoxPort.Text = DEFAULT_PORT;
 
-            // 預設備份格式：Custom (-F c)
-            radioBackupCustom.Checked = true;
-            // 預設還原格式：Custom (-F c)
-            radioRestoreCustom.Checked = true;
+            // 預設備份格式：Plain SQL (.sql)
+            radioBackupPlain.Checked = true;
+            // 預設還原格式：Plain SQL (.sql)
+            radioRestorePlain.Checked = true;
 
-            // 初始化 Restore 按鈕可用狀態
-            UpdateRestoreButtonsState();
-            radioRestoreCustom.CheckedChanged += RadioRestoreMode_CheckedChanged;
-            radioRestorePlain.CheckedChanged += RadioRestoreMode_CheckedChanged;
+            // Restore 按鈕無論選擇何種模式都保持可用
+            buttonRestore.Enabled = true;
         }
 
         // -------------------------------------------------------
@@ -70,29 +68,6 @@ namespace PgBackupRestoreTool
             groupBoxBackup.Enabled = enable;
             groupBoxRestore.Enabled = enable;
             // log區（textBoxLog）保持只讀即可，不用禁用
-        }
-
-        // -------------------------------------------------------
-        //  Restore 按鈕可用狀態 (Plain 時只允許「Delete & Restore」)
-        // -------------------------------------------------------
-        private void RadioRestoreMode_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRestoreButtonsState();
-        }
-
-        private void UpdateRestoreButtonsState()
-        {
-            // 如果是 Plain 模式，只允許「Delete & Restore」
-            if (radioRestorePlain.Checked)
-            {
-                buttonRestore.Enabled = false;
-                buttonDeleteAndRestore.Enabled = true;
-            }
-            else
-            {
-                buttonRestore.Enabled = true;
-                buttonDeleteAndRestore.Enabled = true;
-            }
         }
 
         // -------------------------------------------------------
@@ -206,43 +181,9 @@ namespace PgBackupRestoreTool
             }
         }
 
-        // 「Delete & Restore」按鈕
-        private async void ButtonDeleteAndRestore_Click(object sender, EventArgs e)
-        {
-            ToggleControls(false);
-            progressBar1.Style = ProgressBarStyle.Marquee;
-            progressBar1.Visible = true;
-
-            try
-            {
-                await DeleteAndRestoreAsync();
-            }
-            finally
-            {
-                progressBar1.Visible = false;
-                ToggleControls(true);
-            }
-        }
-
-        // 「Delete」按鈕
-        private async void ButtonDelete_Click(object sender, EventArgs e)
-        {
-            ToggleControls(false);
-            progressBar1.Style = ProgressBarStyle.Marquee;
-            progressBar1.Visible = true;
-
-            try
-            {
-                await DeleteDatabaseAsync();
-            }
-            finally
-            {
-                progressBar1.Visible = false;
-                ToggleControls(true);
-            }
-        }
-
-        // 切換到 Local
+        // -------------------------------------------------------
+        //  切換到 Local / Remote
+        // -------------------------------------------------------
         private void radioLocal_CheckedChanged(object sender, EventArgs e)
         {
             if (radioLocal.Checked)
@@ -252,7 +193,6 @@ namespace PgBackupRestoreTool
             }
         }
 
-        // 切換到 Remote
         private void radioRemote_CheckedChanged(object sender, EventArgs e)
         {
             if (radioRemote.Checked)
@@ -276,8 +216,7 @@ namespace PgBackupRestoreTool
         }
 
         // -------------------------------------------------------
-        //  Backup / Restore / Drop / Create
-        //  （這裡不再操控 progressBar 和控件啟用狀態）
+        //  Backup / Restore
         // -------------------------------------------------------
         private async Task BackupAsync()
         {
@@ -343,45 +282,6 @@ namespace PgBackupRestoreTool
             }
         }
 
-        private async Task DeleteAndRestoreAsync()
-        {
-            string filePath = textBoxRestoreFile.Text;
-            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
-            {
-                Log("Please select a valid backup file to restore.");
-                return;
-            }
-
-            string host = GetHost();
-            string port = textBoxPort.Text.Trim();
-
-            // 1) dropdb
-            Log("Dropping database...");
-            string dropArgs = $"-U {PG_USER} -h {host} -p {port} {PG_DATABASE}";
-            Log($"Command: dropdb {dropArgs}");
-            await RunProcessAsync("dropdb", dropArgs);
-
-            // 2) createdb
-            Log("Creating database...");
-            string createArgs = $"-U {PG_USER} -h {host} -p {port} {PG_DATABASE}";
-            Log($"Command: createdb {createArgs}");
-            await RunProcessAsync("createdb", createArgs);
-
-            // 3) restore
-            await RestoreAsync();
-        }
-
-        private async Task DeleteDatabaseAsync()
-        {
-            string host = GetHost();
-            string port = textBoxPort.Text.Trim();
-
-            Log("Dropping database...");
-            string dropArgs = $"-U {PG_USER} -h {host} -p {port} {PG_DATABASE}";
-            Log($"Command: dropdb {dropArgs}");
-            await RunProcessAsync("dropdb", dropArgs);
-        }
-
         // -------------------------------------------------------
         //  執行外部程式（以UTF8環境）
         // -------------------------------------------------------
@@ -401,7 +301,6 @@ namespace PgBackupRestoreTool
                         CreateNoWindow = true
                     };
 
-                    // 設定環境變數
                     psi.Environment["PGPASSWORD"] = PG_PASSWORD;
                     psi.Environment["PGCLIENTENCODING"] = "UTF8";
 
@@ -506,7 +405,6 @@ namespace PgBackupRestoreTool
             {
                 if (!File.Exists(configFilePath))
                 {
-                    // 若檔案不存在，先建立空白檔（內容為空）
                     File.WriteAllText(configFilePath, "");
                     return;
                 }
@@ -543,7 +441,6 @@ namespace PgBackupRestoreTool
                     }
                 }
 
-                // 把載入到的 knownIPs 都加到 comboBox
                 foreach (var ip in knownIPs)
                 {
                     comboBoxHost.Items.Add(ip);
@@ -559,7 +456,6 @@ namespace PgBackupRestoreTool
         {
             try
             {
-                // 簡單直接覆蓋全部 key
                 string ipLine = "";
                 if (knownIPs.Count > 0)
                 {
@@ -573,8 +469,7 @@ namespace PgBackupRestoreTool
                     $"PG_PASSWORD={PG_PASSWORD}",
                     $"PG_DATABASE={PG_DATABASE}",
                     ipLine
-                };
-                linesToWrite = linesToWrite.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                }.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
                 File.WriteAllLines(configFilePath, linesToWrite);
             }
