@@ -24,346 +24,300 @@
 
         private void InitializeComponent()
         {
-            groupBoxConnection = new GroupBox();
-            buttonTestConnection = new Button();
-            labelPort = new Label();
-            textBoxPort = new TextBox();
-            radioRemote = new RadioButton();
-            radioLocal = new RadioButton();
-            labelHost = new Label();
-            comboBoxHost = new ComboBox();
-            groupBoxBackup = new GroupBox();
-            labelBackupFile = new Label();
-            textBoxBackupFile = new TextBox();
-            buttonBrowseBackup = new Button();
-            radioBackupCustom = new RadioButton();
-            radioBackupPlain = new RadioButton();
-            buttonBackup = new Button();
-            groupBoxRestore = new GroupBox();
-            labelRestoreFile = new Label();
-            textBoxRestoreFile = new TextBox();
-            buttonBrowseRestore = new Button();
-            radioRestoreCustom = new RadioButton();
-            radioRestorePlain = new RadioButton();
-            buttonRestore = new Button();
-            labelSchema = new Label();
-            comboBoxSchema = new ComboBox();
-            checkBoxClean = new CheckBox();
-            textBoxLog = new TextBox();
-            progressBar1 = new ProgressBar();
-            groupBoxConnection.SuspendLayout();
-            groupBoxBackup.SuspendLayout();
-            groupBoxRestore.SuspendLayout();
-            SuspendLayout();
+            this.groupBoxConnection = new System.Windows.Forms.GroupBox();
+            this.labelConnectionString = new System.Windows.Forms.Label();
+            this.comboBoxHost = new System.Windows.Forms.ComboBox();
+            this.buttonTestConnection = new System.Windows.Forms.Button();
+
+            this.groupBoxBackup = new System.Windows.Forms.GroupBox();
+            this.labelBackupFile = new System.Windows.Forms.Label();
+            this.textBoxBackupFile = new System.Windows.Forms.TextBox();
+            this.buttonBrowseBackup = new System.Windows.Forms.Button();
+            this.radioBackupCustom = new System.Windows.Forms.RadioButton();
+            this.radioBackupPlain = new System.Windows.Forms.RadioButton();
+            this.buttonBackup = new System.Windows.Forms.Button();
+
+            this.groupBoxRestore = new System.Windows.Forms.GroupBox();
+            this.labelRestoreFile = new System.Windows.Forms.Label();
+            this.textBoxRestoreFile = new System.Windows.Forms.TextBox();
+            this.buttonBrowseRestore = new System.Windows.Forms.Button();
+            this.radioRestoreCustom = new System.Windows.Forms.RadioButton();
+            this.radioRestorePlain = new System.Windows.Forms.RadioButton();
+            this.buttonRestore = new System.Windows.Forms.Button();
+            this.labelSchema = new System.Windows.Forms.Label();
+            this.comboBoxSchema = new System.Windows.Forms.ComboBox();
+            this.checkBoxClean = new System.Windows.Forms.CheckBox();
+
+            this.textBoxLog = new System.Windows.Forms.TextBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+
+            this.groupBoxConnection.SuspendLayout();
+            this.groupBoxBackup.SuspendLayout();
+            this.groupBoxRestore.SuspendLayout();
+            this.SuspendLayout();
+
             // 
             // groupBoxConnection
             // 
-            groupBoxConnection.Controls.Add(buttonTestConnection);
-            groupBoxConnection.Controls.Add(labelPort);
-            groupBoxConnection.Controls.Add(textBoxPort);
-            groupBoxConnection.Controls.Add(radioRemote);
-            groupBoxConnection.Controls.Add(radioLocal);
-            groupBoxConnection.Controls.Add(labelHost);
-            groupBoxConnection.Controls.Add(comboBoxHost);
-            groupBoxConnection.Location = new Point(10, 10);
-            groupBoxConnection.Name = "groupBoxConnection";
-            groupBoxConnection.Size = new Size(580, 100);
-            groupBoxConnection.TabIndex = 0;
-            groupBoxConnection.TabStop = false;
-            groupBoxConnection.Text = "Connection Settings";
+            this.groupBoxConnection.Controls.Add(this.labelConnectionString);
+            this.groupBoxConnection.Controls.Add(this.comboBoxHost);
+            this.groupBoxConnection.Controls.Add(this.buttonTestConnection);
+            this.groupBoxConnection.Location = new System.Drawing.Point(10, 10);
+            this.groupBoxConnection.Name = "groupBoxConnection";
+            this.groupBoxConnection.Size = new System.Drawing.Size(580, 90);
+            this.groupBoxConnection.TabIndex = 0;
+            this.groupBoxConnection.TabStop = false;
+            this.groupBoxConnection.Text = "Connection";
             // 
-            // buttonTestConnection
+            // labelConnectionString
             // 
-            buttonTestConnection.Location = new Point(450, 60);
-            buttonTestConnection.Name = "buttonTestConnection";
-            buttonTestConnection.Size = new Size(100, 30);
-            buttonTestConnection.TabIndex = 6;
-            buttonTestConnection.Text = "Test Connection";
-            buttonTestConnection.UseVisualStyleBackColor = true;
-            buttonTestConnection.Click += buttonTestConnection_Click;
-            // 
-            // labelPort
-            // 
-            labelPort.AutoSize = true;
-            labelPort.Location = new Point(408, 23);
-            labelPort.Name = "labelPort";
-            labelPort.Size = new Size(32, 15);
-            labelPort.TabIndex = 4;
-            labelPort.Text = "Port:";
-            // 
-            // textBoxPort
-            // 
-            textBoxPort.Location = new Point(450, 20);
-            textBoxPort.Name = "textBoxPort";
-            textBoxPort.Size = new Size(100, 23);
-            textBoxPort.TabIndex = 5;
-            // 
-            // radioRemote
-            // 
-            radioRemote.AutoSize = true;
-            radioRemote.Location = new Point(150, 60);
-            radioRemote.Name = "radioRemote";
-            radioRemote.Size = new Size(65, 19);
-            radioRemote.TabIndex = 2;
-            radioRemote.Text = "Remote";
-            radioRemote.UseVisualStyleBackColor = true;
-            radioRemote.CheckedChanged += radioRemote_CheckedChanged;
-            // 
-            // radioLocal
-            // 
-            radioLocal.AutoSize = true;
-            radioLocal.Location = new Point(60, 60);
-            radioLocal.Name = "radioLocal";
-            radioLocal.Size = new Size(53, 19);
-            radioLocal.TabIndex = 1;
-            radioLocal.Text = "Local";
-            radioLocal.UseVisualStyleBackColor = true;
-            radioLocal.CheckedChanged += radioLocal_CheckedChanged;
-            // 
-            // labelHost
-            // 
-            labelHost.AutoSize = true;
-            labelHost.Location = new Point(10, 22);
-            labelHost.Name = "labelHost";
-            labelHost.Size = new Size(35, 15);
-            labelHost.TabIndex = 0;
-            labelHost.Text = "Host:";
+            this.labelConnectionString.AutoSize = true;
+            this.labelConnectionString.Location = new System.Drawing.Point(10, 30);
+            this.labelConnectionString.Name = "labelConnectionString";
+            this.labelConnectionString.Size = new System.Drawing.Size(117, 15);
+            this.labelConnectionString.TabIndex = 0;
+            this.labelConnectionString.Text = "Connection string:";
             // 
             // comboBoxHost
             // 
-            comboBoxHost.Enabled = false;
-            comboBoxHost.FormattingEnabled = true;
-            comboBoxHost.Location = new Point(60, 20);
-            comboBoxHost.Name = "comboBoxHost";
-            comboBoxHost.Size = new Size(320, 23);
-            comboBoxHost.TabIndex = 3;
+            this.comboBoxHost.FormattingEnabled = true;
+            this.comboBoxHost.Location = new System.Drawing.Point(135, 27);
+            this.comboBoxHost.Name = "comboBoxHost";
+            this.comboBoxHost.Size = new System.Drawing.Size(330, 23);
+            this.comboBoxHost.TabIndex = 1;
+            // 
+            // buttonTestConnection
+            // 
+            this.buttonTestConnection.Location = new System.Drawing.Point(480, 25);
+            this.buttonTestConnection.Name = "buttonTestConnection";
+            this.buttonTestConnection.Size = new System.Drawing.Size(90, 27);
+            this.buttonTestConnection.TabIndex = 2;
+            this.buttonTestConnection.Text = "Test";
+            this.buttonTestConnection.UseVisualStyleBackColor = true;
+            this.buttonTestConnection.Click += new System.EventHandler(this.buttonTestConnection_Click);
             // 
             // groupBoxBackup
             // 
-            groupBoxBackup.Controls.Add(labelBackupFile);
-            groupBoxBackup.Controls.Add(textBoxBackupFile);
-            groupBoxBackup.Controls.Add(buttonBrowseBackup);
-            groupBoxBackup.Controls.Add(radioBackupCustom);
-            groupBoxBackup.Controls.Add(radioBackupPlain);
-            groupBoxBackup.Controls.Add(buttonBackup);
-            groupBoxBackup.Location = new Point(10, 120);
-            groupBoxBackup.Name = "groupBoxBackup";
-            groupBoxBackup.Size = new Size(580, 120);
-            groupBoxBackup.TabIndex = 1;
-            groupBoxBackup.TabStop = false;
-            groupBoxBackup.Text = "Backup";
+            this.groupBoxBackup.Controls.Add(this.labelBackupFile);
+            this.groupBoxBackup.Controls.Add(this.textBoxBackupFile);
+            this.groupBoxBackup.Controls.Add(this.buttonBrowseBackup);
+            this.groupBoxBackup.Controls.Add(this.radioBackupCustom);
+            this.groupBoxBackup.Controls.Add(this.radioBackupPlain);
+            this.groupBoxBackup.Controls.Add(this.buttonBackup);
+            this.groupBoxBackup.Location = new System.Drawing.Point(10, 110);
+            this.groupBoxBackup.Name = "groupBoxBackup";
+            this.groupBoxBackup.Size = new System.Drawing.Size(580, 120);
+            this.groupBoxBackup.TabIndex = 1;
+            this.groupBoxBackup.TabStop = false;
+            this.groupBoxBackup.Text = "Backup";
             // 
             // labelBackupFile
             // 
-            labelBackupFile.AutoSize = true;
-            labelBackupFile.Location = new Point(10, 30);
-            labelBackupFile.Name = "labelBackupFile";
-            labelBackupFile.Size = new Size(68, 15);
-            labelBackupFile.TabIndex = 0;
-            labelBackupFile.Text = "Backup file:";
+            this.labelBackupFile.AutoSize = true;
+            this.labelBackupFile.Location = new System.Drawing.Point(10, 30);
+            this.labelBackupFile.Name = "labelBackupFile";
+            this.labelBackupFile.Size = new System.Drawing.Size(68, 15);
+            this.labelBackupFile.TabIndex = 0;
+            this.labelBackupFile.Text = "Backup file:";
             // 
             // textBoxBackupFile
             // 
-            textBoxBackupFile.Location = new Point(100, 30);
-            textBoxBackupFile.Name = "textBoxBackupFile";
-            textBoxBackupFile.Size = new Size(340, 23);
-            textBoxBackupFile.TabIndex = 1;
+            this.textBoxBackupFile.Location = new System.Drawing.Point(100, 30);
+            this.textBoxBackupFile.Name = "textBoxBackupFile";
+            this.textBoxBackupFile.Size = new System.Drawing.Size(340, 23);
+            this.textBoxBackupFile.TabIndex = 1;
             // 
             // buttonBrowseBackup
             // 
-            buttonBrowseBackup.Location = new Point(450, 30);
-            buttonBrowseBackup.Name = "buttonBrowseBackup";
-            buttonBrowseBackup.Size = new Size(100, 27);
-            buttonBrowseBackup.TabIndex = 2;
-            buttonBrowseBackup.Text = "Browse...";
-            buttonBrowseBackup.UseVisualStyleBackColor = true;
-            buttonBrowseBackup.Click += ButtonBrowseBackup_Click;
+            this.buttonBrowseBackup.Location = new System.Drawing.Point(450, 30);
+            this.buttonBrowseBackup.Name = "buttonBrowseBackup";
+            this.buttonBrowseBackup.Size = new System.Drawing.Size(100, 27);
+            this.buttonBrowseBackup.TabIndex = 2;
+            this.buttonBrowseBackup.Text = "Browse...";
+            this.buttonBrowseBackup.UseVisualStyleBackColor = true;
+            this.buttonBrowseBackup.Click += new System.EventHandler(this.ButtonBrowseBackup_Click);
             // 
             // radioBackupCustom
             // 
-            radioBackupCustom.AutoSize = true;
-            radioBackupCustom.Location = new Point(246, 71);
-            radioBackupCustom.Name = "radioBackupCustom";
-            radioBackupCustom.Size = new Size(134, 19);
-            radioBackupCustom.TabIndex = 3;
-            radioBackupCustom.Text = "Custom format (-F c)";
-            radioBackupCustom.UseVisualStyleBackColor = true;
+            this.radioBackupCustom.AutoSize = true;
+            this.radioBackupCustom.Location = new System.Drawing.Point(246, 71);
+            this.radioBackupCustom.Name = "radioBackupCustom";
+            this.radioBackupCustom.Size = new System.Drawing.Size(134, 19);
+            this.radioBackupCustom.TabIndex = 3;
+            this.radioBackupCustom.Text = "Custom format (-F c)";
+            this.radioBackupCustom.UseVisualStyleBackColor = true;
             // 
             // radioBackupPlain
             // 
-            radioBackupPlain.AutoSize = true;
-            radioBackupPlain.Checked = true;
-            radioBackupPlain.Location = new Point(100, 71);
-            radioBackupPlain.Name = "radioBackupPlain";
-            radioBackupPlain.Size = new Size(104, 19);
-            radioBackupPlain.TabIndex = 4;
-            radioBackupPlain.TabStop = true;
-            radioBackupPlain.Text = "Plain SQL (.sql)";
-            radioBackupPlain.UseVisualStyleBackColor = true;
+            this.radioBackupPlain.AutoSize = true;
+            this.radioBackupPlain.Checked = true;
+            this.radioBackupPlain.Location = new System.Drawing.Point(100, 71);
+            this.radioBackupPlain.Name = "radioBackupPlain";
+            this.radioBackupPlain.Size = new System.Drawing.Size(104, 19);
+            this.radioBackupPlain.TabIndex = 4;
+            this.radioBackupPlain.TabStop = true;
+            this.radioBackupPlain.Text = "Plain SQL (.sql)";
+            this.radioBackupPlain.UseVisualStyleBackColor = true;
             // 
             // buttonBackup
             // 
-            buttonBackup.Location = new Point(450, 65);
-            buttonBackup.Name = "buttonBackup";
-            buttonBackup.Size = new Size(100, 30);
-            buttonBackup.TabIndex = 5;
-            buttonBackup.Text = "Backup";
-            buttonBackup.UseVisualStyleBackColor = true;
-            buttonBackup.Click += ButtonBackup_Click;
+            this.buttonBackup.Location = new System.Drawing.Point(450, 65);
+            this.buttonBackup.Name = "buttonBackup";
+            this.buttonBackup.Size = new System.Drawing.Size(100, 30);
+            this.buttonBackup.TabIndex = 5;
+            this.buttonBackup.Text = "Backup";
+            this.buttonBackup.UseVisualStyleBackColor = true;
+            this.buttonBackup.Click += new System.EventHandler(this.ButtonBackup_Click);
             // 
             // groupBoxRestore
             // 
-            groupBoxRestore.Controls.Add(labelRestoreFile);
-            groupBoxRestore.Controls.Add(textBoxRestoreFile);
-            groupBoxRestore.Controls.Add(buttonBrowseRestore);
-            groupBoxRestore.Controls.Add(radioRestoreCustom);
-            groupBoxRestore.Controls.Add(radioRestorePlain);
-            groupBoxRestore.Controls.Add(buttonRestore);
-            groupBoxRestore.Controls.Add(labelSchema);
-            groupBoxRestore.Controls.Add(comboBoxSchema);
-            groupBoxRestore.Controls.Add(checkBoxClean);
-            groupBoxRestore.Location = new Point(10, 250);
-            groupBoxRestore.Name = "groupBoxRestore";
-            groupBoxRestore.Size = new Size(580, 171);
-            groupBoxRestore.TabIndex = 2;
-            groupBoxRestore.TabStop = false;
-            groupBoxRestore.Text = "Restore";
+            this.groupBoxRestore.Controls.Add(this.labelRestoreFile);
+            this.groupBoxRestore.Controls.Add(this.textBoxRestoreFile);
+            this.groupBoxRestore.Controls.Add(this.buttonBrowseRestore);
+            this.groupBoxRestore.Controls.Add(this.radioRestoreCustom);
+            this.groupBoxRestore.Controls.Add(this.radioRestorePlain);
+            this.groupBoxRestore.Controls.Add(this.buttonRestore);
+            this.groupBoxRestore.Controls.Add(this.labelSchema);
+            this.groupBoxRestore.Controls.Add(this.comboBoxSchema);
+            this.groupBoxRestore.Controls.Add(this.checkBoxClean);
+            this.groupBoxRestore.Location = new System.Drawing.Point(10, 240);
+            this.groupBoxRestore.Name = "groupBoxRestore";
+            this.groupBoxRestore.Size = new System.Drawing.Size(580, 180);
+            this.groupBoxRestore.TabIndex = 2;
+            this.groupBoxRestore.TabStop = false;
+            this.groupBoxRestore.Text = "Restore";
             // 
             // labelRestoreFile
             // 
-            labelRestoreFile.AutoSize = true;
-            labelRestoreFile.Location = new Point(10, 30);
-            labelRestoreFile.Name = "labelRestoreFile";
-            labelRestoreFile.Size = new Size(68, 15);
-            labelRestoreFile.TabIndex = 0;
-            labelRestoreFile.Text = "Backup file:";
+            this.labelRestoreFile.AutoSize = true;
+            this.labelRestoreFile.Location = new System.Drawing.Point(10, 30);
+            this.labelRestoreFile.Name = "labelRestoreFile";
+            this.labelRestoreFile.Size = new System.Drawing.Size(68, 15);
+            this.labelRestoreFile.TabIndex = 0;
+            this.labelRestoreFile.Text = "Backup file:";
             // 
             // textBoxRestoreFile
             // 
-            textBoxRestoreFile.Location = new Point(100, 30);
-            textBoxRestoreFile.Name = "textBoxRestoreFile";
-            textBoxRestoreFile.Size = new Size(340, 23);
-            textBoxRestoreFile.TabIndex = 1;
+            this.textBoxRestoreFile.Location = new System.Drawing.Point(100, 30);
+            this.textBoxRestoreFile.Name = "textBoxRestoreFile";
+            this.textBoxRestoreFile.Size = new System.Drawing.Size(340, 23);
+            this.textBoxRestoreFile.TabIndex = 1;
             // 
             // buttonBrowseRestore
             // 
-            buttonBrowseRestore.Location = new Point(450, 30);
-            buttonBrowseRestore.Name = "buttonBrowseRestore";
-            buttonBrowseRestore.Size = new Size(100, 27);
-            buttonBrowseRestore.TabIndex = 2;
-            buttonBrowseRestore.Text = "Browse...";
-            buttonBrowseRestore.UseVisualStyleBackColor = true;
-            buttonBrowseRestore.Click += ButtonBrowseRestore_Click;
+            this.buttonBrowseRestore.Location = new System.Drawing.Point(450, 30);
+            this.buttonBrowseRestore.Name = "buttonBrowseRestore";
+            this.buttonBrowseRestore.Size = new System.Drawing.Size(100, 27);
+            this.buttonBrowseRestore.TabIndex = 2;
+            this.buttonBrowseRestore.Text = "Browse...";
+            this.buttonBrowseRestore.UseVisualStyleBackColor = true;
+            this.buttonBrowseRestore.Click += new System.EventHandler(this.ButtonBrowseRestore_Click);
             // 
             // radioRestoreCustom
             // 
-            radioRestoreCustom.AutoSize = true;
-            radioRestoreCustom.Location = new Point(246, 70);
-            radioRestoreCustom.Name = "radioRestoreCustom";
-            radioRestoreCustom.Size = new Size(134, 19);
-            radioRestoreCustom.TabIndex = 3;
-            radioRestoreCustom.Text = "Custom format (-F c)";
-            radioRestoreCustom.UseVisualStyleBackColor = true;
+            this.radioRestoreCustom.AutoSize = true;
+            this.radioRestoreCustom.Location = new System.Drawing.Point(246, 70);
+            this.radioRestoreCustom.Name = "radioRestoreCustom";
+            this.radioRestoreCustom.Size = new System.Drawing.Size(134, 19);
+            this.radioRestoreCustom.TabIndex = 3;
+            this.radioRestoreCustom.Text = "Custom format (-F c)";
+            this.radioRestoreCustom.UseVisualStyleBackColor = true;
             // 
             // radioRestorePlain
             // 
-            radioRestorePlain.AutoSize = true;
-            radioRestorePlain.Checked = true;
-            radioRestorePlain.Location = new Point(100, 70);
-            radioRestorePlain.Name = "radioRestorePlain";
-            radioRestorePlain.Size = new Size(104, 19);
-            radioRestorePlain.TabIndex = 4;
-            radioRestorePlain.TabStop = true;
-            radioRestorePlain.Text = "Plain SQL (.sql)";
-            radioRestorePlain.UseVisualStyleBackColor = true;
+            this.radioRestorePlain.AutoSize = true;
+            this.radioRestorePlain.Checked = true;
+            this.radioRestorePlain.Location = new System.Drawing.Point(100, 70);
+            this.radioRestorePlain.Name = "radioRestorePlain";
+            this.radioRestorePlain.Size = new System.Drawing.Size(104, 19);
+            this.radioRestorePlain.TabIndex = 4;
+            this.radioRestorePlain.TabStop = true;
+            this.radioRestorePlain.Text = "Plain SQL (.sql)";
+            this.radioRestorePlain.UseVisualStyleBackColor = true;
             // 
             // buttonRestore
             // 
-            buttonRestore.Location = new Point(450, 120);
-            buttonRestore.Name = "buttonRestore";
-            buttonRestore.Size = new Size(100, 30);
-            buttonRestore.TabIndex = 5;
-            buttonRestore.Text = "Restore";
-            buttonRestore.UseVisualStyleBackColor = true;
-            buttonRestore.Click += ButtonRestore_Click;
+            this.buttonRestore.Location = new System.Drawing.Point(450, 130);
+            this.buttonRestore.Name = "buttonRestore";
+            this.buttonRestore.Size = new System.Drawing.Size(100, 30);
+            this.buttonRestore.TabIndex = 5;
+            this.buttonRestore.Text = "Restore";
+            this.buttonRestore.UseVisualStyleBackColor = true;
+            this.buttonRestore.Click += new System.EventHandler(this.ButtonRestore_Click);
             // 
             // labelSchema
             // 
-            labelSchema.AutoSize = true;
-            labelSchema.Location = new Point(10, 100);
-            labelSchema.Name = "labelSchema";
-            labelSchema.Size = new Size(51, 15);
-            labelSchema.TabIndex = 5;
-            labelSchema.Text = "Schema:";
+            this.labelSchema.AutoSize = true;
+            this.labelSchema.Location = new System.Drawing.Point(10, 100);
+            this.labelSchema.Name = "labelSchema";
+            this.labelSchema.Size = new System.Drawing.Size(51, 15);
+            this.labelSchema.TabIndex = 6;
+            this.labelSchema.Text = "Schema:";
             // 
             // comboBoxSchema
             // 
-            comboBoxSchema.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBoxSchema.Location = new Point(100, 95);
-            comboBoxSchema.Name = "comboBoxSchema";
-            comboBoxSchema.Size = new Size(200, 23);
-            comboBoxSchema.TabIndex = 6;
+            this.comboBoxSchema.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxSchema.Location = new System.Drawing.Point(100, 95);
+            this.comboBoxSchema.Name = "comboBoxSchema";
+            this.comboBoxSchema.Size = new System.Drawing.Size(200, 23);
+            this.comboBoxSchema.TabIndex = 7;
             // 
             // checkBoxClean
             // 
-            checkBoxClean.AutoSize = true;
-            checkBoxClean.Location = new Point(320, 97);
-            checkBoxClean.Name = "checkBoxClean";
-            checkBoxClean.Size = new Size(174, 19);
-            checkBoxClean.TabIndex = 7;
-            checkBoxClean.Text = "Clean schema before restore";
-            checkBoxClean.UseVisualStyleBackColor = true;
+            this.checkBoxClean.AutoSize = true;
+            this.checkBoxClean.Location = new System.Drawing.Point(320, 97);
+            this.checkBoxClean.Name = "checkBoxClean";
+            this.checkBoxClean.Size = new System.Drawing.Size(174, 19);
+            this.checkBoxClean.TabIndex = 8;
+            this.checkBoxClean.Text = "Clean schema before restore";
+            this.checkBoxClean.UseVisualStyleBackColor = true;
             // 
             // textBoxLog
             // 
-            textBoxLog.Location = new Point(10, 458);
-            textBoxLog.Multiline = true;
-            textBoxLog.Name = "textBoxLog";
-            textBoxLog.ReadOnly = true;
-            textBoxLog.ScrollBars = ScrollBars.Vertical;
-            textBoxLog.Size = new Size(580, 110);
-            textBoxLog.TabIndex = 3;
+            this.textBoxLog.Location = new System.Drawing.Point(10, 430);
+            this.textBoxLog.Multiline = true;
+            this.textBoxLog.Name = "textBoxLog";
+            this.textBoxLog.ReadOnly = true;
+            this.textBoxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBoxLog.Size = new System.Drawing.Size(580, 110);
+            this.textBoxLog.TabIndex = 3;
             // 
             // progressBar1
             // 
-            progressBar1.Location = new Point(8, 427);
-            progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(580, 25);
-            progressBar1.TabIndex = 4;
-            progressBar1.Visible = false;
+            this.progressBar1.Location = new System.Drawing.Point(10, 400);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(580, 25);
+            this.progressBar1.TabIndex = 4;
+            this.progressBar1.Visible = false;
             // 
             // frmMain
             // 
-            ClientSize = new Size(600, 580);
-            Controls.Add(progressBar1);
-            Controls.Add(textBoxLog);
-            Controls.Add(groupBoxRestore);
-            Controls.Add(groupBoxBackup);
-            Controls.Add(groupBoxConnection);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            Name = "frmMain";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "PostgreSQL Backup/Restore Tool";
-            groupBoxConnection.ResumeLayout(false);
-            groupBoxConnection.PerformLayout();
-            groupBoxBackup.ResumeLayout(false);
-            groupBoxBackup.PerformLayout();
-            groupBoxRestore.ResumeLayout(false);
-            groupBoxRestore.PerformLayout();
-            ResumeLayout(false);
-            PerformLayout();
+            this.ClientSize = new System.Drawing.Size(600, 550);
+            this.Controls.Add(this.progressBar1);
+            this.Controls.Add(this.textBoxLog);
+            this.Controls.Add(this.groupBoxRestore);
+            this.Controls.Add(this.groupBoxBackup);
+            this.Controls.Add(this.groupBoxConnection);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.Name = "frmMain";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "PostgreSQL Backup/Restore Tool";
+            this.groupBoxConnection.ResumeLayout(false);
+            this.groupBoxConnection.PerformLayout();
+            this.groupBoxBackup.ResumeLayout(false);
+            this.groupBoxBackup.PerformLayout();
+            this.groupBoxRestore.ResumeLayout(false);
+            this.groupBoxRestore.PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
         }
 
         #endregion
 
         private System.Windows.Forms.GroupBox groupBoxConnection;
-        private System.Windows.Forms.Label labelHost;
+        private System.Windows.Forms.Label labelConnectionString;
         private System.Windows.Forms.ComboBox comboBoxHost;
-        private System.Windows.Forms.RadioButton radioLocal;
-        private System.Windows.Forms.RadioButton radioRemote;
-        private System.Windows.Forms.Label labelPort;
-        private System.Windows.Forms.TextBox textBoxPort;
         private System.Windows.Forms.Button buttonTestConnection;
 
         private System.Windows.Forms.GroupBox groupBoxBackup;
@@ -380,10 +334,10 @@
         private System.Windows.Forms.Button buttonBrowseRestore;
         private System.Windows.Forms.RadioButton radioRestoreCustom;
         private System.Windows.Forms.RadioButton radioRestorePlain;
+        private System.Windows.Forms.Button buttonRestore;
         private System.Windows.Forms.Label labelSchema;
         private System.Windows.Forms.ComboBox comboBoxSchema;
         private System.Windows.Forms.CheckBox checkBoxClean;
-        private System.Windows.Forms.Button buttonRestore;
 
         private System.Windows.Forms.TextBox textBoxLog;
         private System.Windows.Forms.ProgressBar progressBar1;
