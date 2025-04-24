@@ -46,6 +46,9 @@
             radioRestoreCustom = new RadioButton();
             radioRestorePlain = new RadioButton();
             buttonRestore = new Button();
+            labelSchema = new Label();
+            comboBoxSchema = new ComboBox();
+            checkBoxClean = new CheckBox();
             textBoxLog = new TextBox();
             progressBar1 = new ProgressBar();
             groupBoxConnection.SuspendLayout();
@@ -216,9 +219,12 @@
             groupBoxRestore.Controls.Add(radioRestoreCustom);
             groupBoxRestore.Controls.Add(radioRestorePlain);
             groupBoxRestore.Controls.Add(buttonRestore);
+            groupBoxRestore.Controls.Add(labelSchema);
+            groupBoxRestore.Controls.Add(comboBoxSchema);
+            groupBoxRestore.Controls.Add(checkBoxClean);
             groupBoxRestore.Location = new Point(10, 250);
             groupBoxRestore.Name = "groupBoxRestore";
-            groupBoxRestore.Size = new Size(580, 120);
+            groupBoxRestore.Size = new Size(580, 171);
             groupBoxRestore.TabIndex = 2;
             groupBoxRestore.TabStop = false;
             groupBoxRestore.Text = "Restore";
@@ -273,7 +279,7 @@
             // 
             // buttonRestore
             // 
-            buttonRestore.Location = new Point(450, 70);
+            buttonRestore.Location = new Point(450, 120);
             buttonRestore.Name = "buttonRestore";
             buttonRestore.Size = new Size(100, 30);
             buttonRestore.TabIndex = 5;
@@ -281,19 +287,46 @@
             buttonRestore.UseVisualStyleBackColor = true;
             buttonRestore.Click += ButtonRestore_Click;
             // 
+            // labelSchema
+            // 
+            labelSchema.AutoSize = true;
+            labelSchema.Location = new Point(10, 100);
+            labelSchema.Name = "labelSchema";
+            labelSchema.Size = new Size(51, 15);
+            labelSchema.TabIndex = 5;
+            labelSchema.Text = "Schema:";
+            // 
+            // comboBoxSchema
+            // 
+            comboBoxSchema.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxSchema.Location = new Point(100, 95);
+            comboBoxSchema.Name = "comboBoxSchema";
+            comboBoxSchema.Size = new Size(200, 23);
+            comboBoxSchema.TabIndex = 6;
+            // 
+            // checkBoxClean
+            // 
+            checkBoxClean.AutoSize = true;
+            checkBoxClean.Location = new Point(320, 97);
+            checkBoxClean.Name = "checkBoxClean";
+            checkBoxClean.Size = new Size(174, 19);
+            checkBoxClean.TabIndex = 7;
+            checkBoxClean.Text = "Clean schema before restore";
+            checkBoxClean.UseVisualStyleBackColor = true;
+            // 
             // textBoxLog
             // 
-            textBoxLog.Location = new Point(12, 407);
+            textBoxLog.Location = new Point(10, 458);
             textBoxLog.Multiline = true;
             textBoxLog.Name = "textBoxLog";
             textBoxLog.ReadOnly = true;
             textBoxLog.ScrollBars = ScrollBars.Vertical;
-            textBoxLog.Size = new Size(580, 130);
+            textBoxLog.Size = new Size(580, 110);
             textBoxLog.TabIndex = 3;
             // 
             // progressBar1
             // 
-            progressBar1.Location = new Point(12, 376);
+            progressBar1.Location = new Point(8, 427);
             progressBar1.Name = "progressBar1";
             progressBar1.Size = new Size(580, 25);
             progressBar1.TabIndex = 4;
@@ -301,7 +334,7 @@
             // 
             // frmMain
             // 
-            ClientSize = new Size(600, 545);
+            ClientSize = new Size(600, 580);
             Controls.Add(progressBar1);
             Controls.Add(textBoxLog);
             Controls.Add(groupBoxRestore);
@@ -347,6 +380,9 @@
         private System.Windows.Forms.Button buttonBrowseRestore;
         private System.Windows.Forms.RadioButton radioRestoreCustom;
         private System.Windows.Forms.RadioButton radioRestorePlain;
+        private System.Windows.Forms.Label labelSchema;
+        private System.Windows.Forms.ComboBox comboBoxSchema;
+        private System.Windows.Forms.CheckBox checkBoxClean;
         private System.Windows.Forms.Button buttonRestore;
 
         private System.Windows.Forms.TextBox textBoxLog;

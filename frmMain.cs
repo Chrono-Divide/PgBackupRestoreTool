@@ -42,12 +42,10 @@ namespace PgBackupRestoreTool
             InitializeComponent();
 
             string fullVersion = Assembly.GetExecutingAssembly()
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
-            .InformationalVersion ?? "unknown";
-
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion ?? "unknown";
             // 只取 "+" 前的部分
             string displayVersion = fullVersion.Split('+')[0];
-
             this.Text = $"PostgreSQL Backup/Restore Tool v{displayVersion}";
 
             // 讀取外部檔 (若無則建空檔)
@@ -69,21 +67,17 @@ namespace PgBackupRestoreTool
         // -------------------------------------------------------
         //  UI控件啟用/禁用
         // -------------------------------------------------------
-        /// <summary>
-        /// 一次性啟用/停用所有主要操作區塊。
-        /// </summary>
         private void ToggleControls(bool enable)
         {
             groupBoxConnection.Enabled = enable;
             groupBoxBackup.Enabled = enable;
             groupBoxRestore.Enabled = enable;
-            // log區（textBoxLog）保持只讀即可，不用禁用
+            // textBoxLog 保持只讀
         }
 
         // -------------------------------------------------------
         //  按鈕事件
         // -------------------------------------------------------
-        // 「Test Connection」
         private async void buttonTestConnection_Click(object sender, EventArgs e)
         {
             ToggleControls(false);
@@ -94,7 +88,7 @@ namespace PgBackupRestoreTool
             {
                 string host = GetHost();
                 string port = textBoxPort.Text.Trim();
-                // 直接使用 psql -l (列出所有DB) 來測試
+                // 使用 psql -l 列出所有 DB
                 string arguments = $"-U {PG_USER} -h {host} -p {port} -l";
 
                 bool success = await RunProcessAndCheckSuccess("psql", arguments);
@@ -110,6 +104,9 @@ namespace PgBackupRestoreTool
                         comboBoxHost.Items.Add(host);
                         SaveConfig();
                     }
+
+                    // 載入可選 schema 列表
+                    await LoadSchemasAsync();
                 }
                 else
                 {
@@ -123,7 +120,6 @@ namespace PgBackupRestoreTool
             }
         }
 
-        // 「Browse...」（備份）
         private void ButtonBrowseBackup_Click(object sender, EventArgs e)
         {
             using (SaveFileDialog sfd = new SaveFileDialog())
@@ -139,7 +135,6 @@ namespace PgBackupRestoreTool
             }
         }
 
-        // 「Browse...」（還原）
         private void ButtonBrowseRestore_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
@@ -155,13 +150,11 @@ namespace PgBackupRestoreTool
             }
         }
 
-        // 「Backup」按鈕
         private async void ButtonBackup_Click(object sender, EventArgs e)
         {
             ToggleControls(false);
             progressBar1.Style = ProgressBarStyle.Marquee;
             progressBar1.Visible = true;
-
             try
             {
                 await BackupAsync();
@@ -173,13 +166,11 @@ namespace PgBackupRestoreTool
             }
         }
 
-        // 「Restore」按鈕
         private async void ButtonRestore_Click(object sender, EventArgs e)
         {
             ToggleControls(false);
             progressBar1.Style = ProgressBarStyle.Marquee;
             progressBar1.Visible = true;
-
             try
             {
                 await RestoreAsync();
@@ -209,9 +200,7 @@ namespace PgBackupRestoreTool
             {
                 comboBoxHost.Enabled = true;
                 if (string.IsNullOrWhiteSpace(comboBoxHost.Text) || comboBoxHost.Text == "localhost")
-                {
                     comboBoxHost.Text = "";
-                }
             }
         }
 
@@ -226,7 +215,7 @@ namespace PgBackupRestoreTool
         }
 
         // -------------------------------------------------------
-        //  Backup / Restore
+        //  Backup
         // -------------------------------------------------------
         private async Task BackupAsync()
         {
@@ -261,6 +250,9 @@ namespace PgBackupRestoreTool
             await RunProcessAsync("pg_dump", arguments);
         }
 
+        // -------------------------------------------------------
+        //  Restore
+        // -------------------------------------------------------
         private async Task RestoreAsync()
         {
             string filePath = textBoxRestoreFile.Text;
@@ -284,7 +276,16 @@ namespace PgBackupRestoreTool
             }
             else
             {
-                // psql -U <user> -h <host> -p <port> -d <db> -f "filePath"
+                // Plain SQL restore，先選擇性清理 schema
+                if (checkBoxClean.Checked && comboBoxSchema.SelectedItem != null)
+                {
+                    string schema = comboBoxSchema.SelectedItem.ToString();
+                    Log($"Dropping and recreating schema '{schema}'...");
+                    string dropSql = $"DROP SCHEMA IF EXISTS \"{schema}\" CASCADE; CREATE SCHEMA \"{schema}\";";
+                    string dropArgs = $"-U {PG_USER} -h {host} -p {port} -d {PG_DATABASE} -c \"{dropSql}\"";
+                    await RunProcessAsync("psql", dropArgs);
+                }
+
                 string arguments = $"-U {PG_USER} -h {host} -p {port} -d {PG_DATABASE} -f \"{filePath}\"";
                 Log("Starting restore using psql (Plain SQL)...");
                 Log($"Command: psql {arguments}");
@@ -293,7 +294,7 @@ namespace PgBackupRestoreTool
         }
 
         // -------------------------------------------------------
-        //  執行外部程式（以UTF8環境）
+        //  執行外部程式（以 UTF8 環境）
         // -------------------------------------------------------
         private async Task RunProcessAsync(string fileName, string arguments)
         {
@@ -301,7 +302,7 @@ namespace PgBackupRestoreTool
             {
                 try
                 {
-                    ProcessStartInfo psi = new ProcessStartInfo
+                    var psi = new ProcessStartInfo
                     {
                         FileName = fileName,
                         Arguments = arguments,
@@ -310,11 +311,10 @@ namespace PgBackupRestoreTool
                         UseShellExecute = false,
                         CreateNoWindow = true
                     };
-
                     psi.Environment["PGPASSWORD"] = PG_PASSWORD;
                     psi.Environment["PGCLIENTENCODING"] = "UTF8";
 
-                    using (Process process = new Process())
+                    using (var process = new Process())
                     {
                         process.StartInfo = psi;
                         process.Start();
@@ -349,7 +349,7 @@ namespace PgBackupRestoreTool
             {
                 try
                 {
-                    ProcessStartInfo psi = new ProcessStartInfo
+                    var psi = new ProcessStartInfo
                     {
                         FileName = fileName,
                         Arguments = arguments,
@@ -358,11 +358,10 @@ namespace PgBackupRestoreTool
                         UseShellExecute = false,
                         CreateNoWindow = true
                     };
-
                     psi.Environment["PGPASSWORD"] = PG_PASSWORD;
                     psi.Environment["PGCLIENTENCODING"] = "UTF8";
 
-                    using (Process process = new Process())
+                    using (var process = new Process())
                     {
                         process.StartInfo = psi;
                         process.Start();
@@ -372,16 +371,83 @@ namespace PgBackupRestoreTool
                         process.WaitForExit();
 
                         result = (process.ExitCode == 0);
-
                         if (!result && !string.IsNullOrEmpty(error))
-                        {
                             Log($"[TestConnection Error]: {error.Trim()}");
-                        }
                     }
                 }
                 catch (Exception ex)
                 {
                     Log($"RunProcessAndCheckSuccess error: {ex.Message}");
+                }
+            });
+
+            return result;
+        }
+
+        // -------------------------------------------------------
+        //  載入可選 Schema 列表
+        // -------------------------------------------------------
+        private async Task LoadSchemasAsync()
+        {
+            try
+            {
+                comboBoxSchema.Items.Clear();
+                string host = GetHost();
+                string port = textBoxPort.Text.Trim();
+                string sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog','information_schema') ORDER BY schema_name;";
+                string arguments = $"-U {PG_USER} -h {host} -p {port} -d {PG_DATABASE} -t -c \"{sql}\"";
+                var output = await RunProcessAndCaptureOutput("psql", arguments);
+
+                var schemas = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(s => s.Trim())
+                                    .Where(s => s.Length > 0);
+
+                foreach (var schema in schemas)
+                    comboBoxSchema.Items.Add(schema);
+
+                if (comboBoxSchema.Items.Count > 0)
+                    comboBoxSchema.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                Log($"LoadSchemasAsync error: {ex.Message}");
+            }
+        }
+
+        private async Task<string> RunProcessAndCaptureOutput(string fileName, string arguments)
+        {
+            string result = string.Empty;
+
+            await Task.Run(() =>
+            {
+                try
+                {
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = fileName,
+                        Arguments = arguments,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    psi.Environment["PGPASSWORD"] = PG_PASSWORD;
+                    psi.Environment["PGCLIENTENCODING"] = "UTF8";
+
+                    using (var process = new Process())
+                    {
+                        process.StartInfo = psi;
+                        process.Start();
+                        result = process.StandardOutput.ReadToEnd();
+                        string error = process.StandardError.ReadToEnd();
+                        process.WaitForExit();
+                        if (!string.IsNullOrEmpty(error))
+                            Log(error.Trim());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log($"RunProcessAndCaptureOutput error: {ex.Message}");
                 }
             });
 
@@ -423,12 +489,10 @@ namespace PgBackupRestoreTool
                 foreach (var rawLine in lines)
                 {
                     string line = rawLine.Trim();
-                    if (line.Length == 0 || line.StartsWith("#"))
-                        continue;
+                    if (line.Length == 0 || line.StartsWith("#")) continue;
 
                     int idx = line.IndexOf('=');
-                    if (idx < 0)
-                        continue;
+                    if (idx < 0) continue;
 
                     string key = line.Substring(0, idx).Trim();
                     string value = line.Substring(idx + 1).Trim();
@@ -452,9 +516,7 @@ namespace PgBackupRestoreTool
                 }
 
                 foreach (var ip in knownIPs)
-                {
                     comboBoxHost.Items.Add(ip);
-                }
             }
             catch (Exception ex)
             {
@@ -466,11 +528,9 @@ namespace PgBackupRestoreTool
         {
             try
             {
-                string ipLine = "";
-                if (knownIPs.Count > 0)
-                {
-                    ipLine = "KNOWN_IPS=" + string.Join(";", knownIPs);
-                }
+                string ipLine = knownIPs.Count > 0
+                    ? "KNOWN_IPS=" + string.Join(";", knownIPs)
+                    : "";
 
                 var linesToWrite = new List<string>
                 {
