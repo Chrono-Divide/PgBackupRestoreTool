@@ -230,23 +230,23 @@ namespace PgBackupRestoreTool
             string host = GetHost();
             string port = textBoxPort.Text.Trim();
 
-            // pg_dump -U <user> -h <host> -p <port> [-F c] [-C] -f "filePath" <db>
+            // pg_dump -U <user> -h <host> -p <port> [-F c] [-c] [-C] -f "filePath" <db>
             string arguments = $"-U {PG_USER} -h {host} -p {port} ";
             if (isCustom)
             {
                 // Custom binary format
                 arguments += $"-F c -f \"{filePath}\" ";
+                Log($"Starting backup (Custom format)...");
             }
             else
             {
-                // Plain SQL + --create: 包含 CREATE DATABASE / \connect
-                arguments += $"-C -f \"{filePath}\" ";
+                // Plain SQL + --clean + --create: 包含 DROP IF EXISTS 及 CREATE
+                arguments += $"-c -C -f \"{filePath}\" ";
+                Log($"Starting backup (Plain SQL with clean & create)...");
             }
             arguments += PG_DATABASE;
 
-            Log($"Starting backup ({(isCustom ? "Custom format" : "Plain SQL with create")})...");
             Log($"Command: pg_dump {arguments}");
-
             await RunProcessAsync("pg_dump", arguments);
         }
 
