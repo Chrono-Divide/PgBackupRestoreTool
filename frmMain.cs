@@ -236,7 +236,8 @@ namespace PgBackupRestoreTool
                     string schema = comboBoxSchema.SelectedItem.ToString();
                     Log($"Dropping and recreating schema '{schema}'...");
 
-                    string dropSql = $"DROP SCHEMA IF EXISTS \"{schema}\" CASCADE; CREATE SCHEMA \"{schema}\";";
+                    string dropSql = $"DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;";
+
                     var dropArgs = new[]
                     {
                         "-U", PG_USER,
