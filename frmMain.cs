@@ -519,5 +519,57 @@ namespace PgBackupRestoreTool
             groupBoxBackup.Enabled = enable;
             groupBoxRestore.Enabled = enable;
         }
+
+        private async void ButtonKillSessions_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show(
+            "This will forcibly terminate ALL other sessions on the database.\n" +
+            "Continue?",
+            "Terminate connections",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Warning) == DialogResult.No)
+                return;
+
+            ToggleControls(false);
+            progressBar1.Style = ProgressBarStyle.Marquee;
+            progressBar1.Visible = true;
+
+            try
+            {
+                PrepareConnectionInfo(out string host, out string port);
+
+                string sql = @"
+            SELECT pg_terminate_backend(pid)
+            FROM pg_stat_activity
+            WHERE datname = current_database()
+              AND pid <> pg_backend_pid();";
+
+                var args = new[]
+                {
+            "-U", PG_USER,
+            "-h", host,
+            "-p", port,
+            "-d", PG_DATABASE,
+            "-c", sql
+        };
+
+                Log("Terminating other sessions...");
+                await RunProcessAsync("psql", args);
+            }
+            finally
+            {
+                progressBar1.Visible = false;
+                ToggleControls(true);
+            }
+        }
+
+        private void CheckBoxMutualExclusive(object? sender, EventArgs e)
+        {
+            if (sender == checkBoxClean && checkBoxClean.Checked)
+                checkBoxDrop.Checked = false;
+            else if (sender == checkBoxDrop && checkBoxDrop.Checked)
+                checkBoxClean.Checked = false;
+        }
+
     }
 }

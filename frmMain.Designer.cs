@@ -44,6 +44,7 @@ namespace PgBackupRestoreTool
             radioBackupCustom = new RadioButton();
             buttonBackup = new Button();
             groupBoxRestore = new GroupBox();
+            ButtonKillSessions = new Button();
             checkBoxDrop = new CheckBox();
             labelRestoreFile = new Label();
             textBoxRestoreFile = new TextBox();
@@ -175,6 +176,7 @@ namespace PgBackupRestoreTool
             // 
             // groupBoxRestore
             // 
+            groupBoxRestore.Controls.Add(ButtonKillSessions);
             groupBoxRestore.Controls.Add(checkBoxDrop);
             groupBoxRestore.Controls.Add(labelRestoreFile);
             groupBoxRestore.Controls.Add(textBoxRestoreFile);
@@ -192,6 +194,16 @@ namespace PgBackupRestoreTool
             groupBoxRestore.TabStop = false;
             groupBoxRestore.Text = "Restore";
             // 
+            // ButtonKillSessions
+            // 
+            ButtonKillSessions.Location = new Point(493, 97);
+            ButtonKillSessions.Name = "ButtonKillSessions";
+            ButtonKillSessions.Size = new Size(100, 30);
+            ButtonKillSessions.TabIndex = 10;
+            ButtonKillSessions.Text = "Terminate";
+            ButtonKillSessions.UseVisualStyleBackColor = true;
+            ButtonKillSessions.Click += ButtonKillSessions_Click;
+            // 
             // checkBoxDrop
             // 
             checkBoxDrop.AutoSize = true;
@@ -203,6 +215,7 @@ namespace PgBackupRestoreTool
             checkBoxDrop.TabIndex = 9;
             checkBoxDrop.Text = "Drop schema before restore";
             checkBoxDrop.UseVisualStyleBackColor = true;
+            checkBoxDrop.CheckedChanged += CheckBoxMutualExclusive;
             // 
             // labelRestoreFile
             // 
@@ -278,6 +291,7 @@ namespace PgBackupRestoreTool
             checkBoxClean.TabIndex = 7;
             checkBoxClean.Text = "Clean schema before restore";
             checkBoxClean.UseVisualStyleBackColor = true;
+            checkBoxClean.CheckedChanged += CheckBoxMutualExclusive;
             // 
             // buttonRestore
             // 
@@ -359,5 +373,6 @@ namespace PgBackupRestoreTool
         private ProgressBar progressBar1;
         private TextBox textBoxLog;
         private CheckBox checkBoxDrop;
+        private Button ButtonKillSessions;
     }
 }
