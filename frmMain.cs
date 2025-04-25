@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,39 +14,39 @@ namespace PgBackupRestoreTool
 {
     public partial class frmMain : Form
     {
-        // ---------- 內部類 ----------
+        // ---------- inner class ----------
         public class DbConfig
         {
             public List<string> ConnectionStrings { get; set; } = new();
             public string LastUsedConnection { get; set; } = "";
         }
 
-        // ---------- 常量 / 欄位 ----------
+        // ---------- constants / fields ----------
         private const string DEFAULT_PORT = "5432";
         private string PG_USER = "";
         private string PG_PASSWORD = "";
         private string PG_DATABASE = "";
         private bool _connected;
+        private Process? _runningProcess;
 
         private string lastDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         private readonly string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "dbconfig.json");
         private DbConfig dbConfig = new();
 
-        // ---------- 初始化 ----------
+        // ---------- ctor ----------
         public frmMain()
         {
             InitializeComponent();
 
-            string fullVersion = Assembly.GetExecutingAssembly()
+            string version = Assembly.GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
-            string displayVersion = fullVersion.Split('+')[0];
-            Text = $"PostgreSQL Backup/Restore Tool v{displayVersion}";
+            Text = $"PostgreSQL Backup/Restore Tool v{version.Split('+')[0]}";
 
             LoadConfig();
             SetConnectedState(false);
         }
 
-        // ---------- UI 狀態 ----------
+        // ---------- UI state ----------
         private void SetConnectedState(bool connected)
         {
             _connected = connected;
@@ -67,7 +68,15 @@ namespace PgBackupRestoreTool
             checkBoxDrop.Enabled = enable;
         }
 
-        // ---------- 連接字串解析 ----------
+        private void EnableAbort(bool enable)
+        {
+            if (buttonAbort.InvokeRequired)
+                buttonAbort.Invoke(new Action(() => buttonAbort.Enabled = enable));
+            else
+                buttonAbort.Enabled = enable;
+        }
+
+        // ---------- connection string ----------
         private void PrepareConnectionInfo(out string host, out string port)
         {
             string conn = comboBoxHost.Text.Trim();
@@ -95,20 +104,19 @@ namespace PgBackupRestoreTool
             try
             {
                 PrepareConnectionInfo(out string host, out string port);
-
                 var args = new[] { "-U", PG_USER, "-h", host, "-p", port, "-l" };
                 bool success = await RunProcessAndCheckSuccess("psql", args);
 
                 if (success)
                 {
-                    Log("Connection test SUCCESS.");
+                    Log("Connection test SUCCESS.", Color.Green);
                     SaveConfig();
                     SetConnectedState(true);
                     await LoadSchemasAsync();
                 }
                 else
                 {
-                    Log("Connection test FAILED.");
+                    Log("Connection test FAILED.", Color.Red);
                     SetConnectedState(false);
                 }
             }
@@ -119,7 +127,7 @@ namespace PgBackupRestoreTool
             }
         }
 
-        // ---------- 檔案選擇 ----------
+        // ---------- File dialogs ----------
         private void ButtonBrowseBackup_Click(object sender, EventArgs e)
         {
             using var sfd = new SaveFileDialog
@@ -157,15 +165,14 @@ namespace PgBackupRestoreTool
             progressBar1.Value = 0;
             progressBar1.Style = ProgressBarStyle.Marquee;
             progressBar1.Visible = true;
+            EnableAbort(true);
 
-            try
-            {
-                await BackupAsync();
-            }
+            try { await BackupAsync(); }
             finally
             {
                 progressBar1.Visible = false;
                 ToggleControls(true);
+                EnableAbort(false);
             }
         }
 
@@ -174,7 +181,7 @@ namespace PgBackupRestoreTool
             string filePath = textBoxBackupFile.Text;
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                Log("Please specify the backup file path.");
+                Log("Please specify the backup file path.", Color.Orange);
                 return;
             }
 
@@ -186,16 +193,16 @@ namespace PgBackupRestoreTool
             if (isCustom)
             {
                 args.AddRange(new[] { "-F", "c", "-v", "-f", filePath });
-                Log("Starting backup (Custom format, verbose)...");
+                Log("Starting backup (Custom format, verbose)...", Color.Blue);
             }
             else
             {
                 args.AddRange(new[] { "-c", "-C", "-v", "-f", filePath });
-                Log("Starting backup (Plain SQL with clean & create, verbose)...");
+                Log("Starting backup (Plain SQL with clean & create, verbose)...", Color.Blue);
             }
 
             args.Add(PG_DATABASE);
-            Log($"Command: pg_dump {string.Join(' ', args)}");
+            Log($"Command: pg_dump {string.Join(' ', args)}", Color.DimGray);
 
             await RunProcessStreamingAsync("pg_dump", args);
         }
@@ -207,15 +214,14 @@ namespace PgBackupRestoreTool
             progressBar1.Value = 0;
             progressBar1.Style = ProgressBarStyle.Marquee;
             progressBar1.Visible = true;
+            EnableAbort(true);
 
-            try
-            {
-                await RestoreAsync();
-            }
+            try { await RestoreAsync(); }
             finally
             {
                 progressBar1.Visible = false;
                 ToggleControls(true);
+                EnableAbort(false);
             }
         }
 
@@ -224,7 +230,7 @@ namespace PgBackupRestoreTool
             string filePath = textBoxRestoreFile.Text;
             if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
             {
-                Log("Please select a valid backup file to restore.");
+                Log("Please select a valid backup file to restore.", Color.Orange);
                 return;
             }
 
@@ -236,7 +242,7 @@ namespace PgBackupRestoreTool
                 int totalItems = await GetTocItemCountAsync(filePath);
                 if (totalItems <= 0) totalItems = 1;
 
-                Log($"Starting restore using pg_restore (Custom, verbose)... Total TOC items: {totalItems}");
+                Log($"Starting restore using pg_restore (Custom, verbose)... Total TOC items: {totalItems}", Color.Blue);
                 var args = new[]
                 {
                     "-U", PG_USER, "-h", host, "-p", port,
@@ -244,7 +250,7 @@ namespace PgBackupRestoreTool
                     "--dbname", PG_DATABASE,
                     filePath
                 };
-                Log($"Command: pg_restore {string.Join(' ', args)}");
+                Log($"Command: pg_restore {string.Join(' ', args)}", Color.DimGray);
                 await RunPgRestoreWithProgressAsync("pg_restore", args, totalItems);
             }
             else            // ----- Plain SQL (.sql) -----
@@ -258,12 +264,12 @@ namespace PgBackupRestoreTool
                     if ((doDrop || doClean) && schema.Equals("public", StringComparison.OrdinalIgnoreCase))
                     {
                         if (MessageBox.Show(
-                            "You are about to DROP the default 'public' schema.\nAll objects inside will be removed.\nContinue?",
-                            "Confirm DROP public schema",
-                            MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Warning) == DialogResult.No)
+                                "You are about to DROP the default 'public' schema.\nAll objects inside will be removed.\nContinue?",
+                                "Confirm DROP public schema",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Warning) == DialogResult.No)
                         {
-                            Log("User cancelled dropping the 'public' schema. Restore aborted.");
+                            Log("User cancelled dropping the 'public' schema. Restore aborted.", Color.Orange);
                             return;
                         }
                     }
@@ -272,7 +278,7 @@ namespace PgBackupRestoreTool
                         ? $"DROP SCHEMA IF EXISTS \"{schema}\" CASCADE; CREATE SCHEMA \"{schema}\";"
                         : $"DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;";
 
-                    Log($"{(doClean ? "Dropping & recreating" : "Dropping")} schema '{schema}'...");
+                    Log($"{(doClean ? "Dropping & recreating" : "Dropping")} schema '{schema}'...", Color.Blue);
                     var dropArgs = new[]
                     {
                         "-U", PG_USER, "-h", host, "-p", port,
@@ -281,21 +287,37 @@ namespace PgBackupRestoreTool
                     await RunProcessStreamingAsync("psql", dropArgs);
                 }
 
-                // --echo-all 讓 psql 把每條 SQL echo 出來，方便觀察 --
-                Log("Starting restore using psql (Plain SQL, echo-all)...");
+                Log("Starting restore using psql (Plain SQL, echo-all)...", Color.Blue);
                 var args2 = new[]
                 {
                     "-U", PG_USER, "-h", host, "-p", port,
                     "-d", PG_DATABASE, "--echo-all",
                     "-f", filePath
                 };
-                Log($"Command: psql {string.Join(' ', args2)}");
+                Log($"Command: psql {string.Join(' ', args2)}", Color.DimGray);
                 await RunProcessStreamingAsync("psql", args2);
             }
         }
 
-        // ---------- Process (Streaming) ----------
-        private async Task RunProcessStreamingAsync(string fileName, IEnumerable<string> args)
+        // ---------- Abort ----------
+        private void buttonAbort_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_runningProcess != null && !_runningProcess.HasExited)
+                {
+                    _runningProcess.Kill(true);
+                    Log("[Aborted] User cancelled running process.", Color.OrangeRed);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Abort error: {ex.Message}", Color.Red);
+            }
+        }
+
+        // ---------- Streaming process ----------
+        private async Task RunProcessStreamingAsync(string exe, IEnumerable<string> args)
         {
             await Task.Run(() =>
             {
@@ -303,7 +325,7 @@ namespace PgBackupRestoreTool
                 {
                     var psi = new ProcessStartInfo
                     {
-                        FileName = fileName,
+                        FileName = exe,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
@@ -313,31 +335,44 @@ namespace PgBackupRestoreTool
                     psi.Environment["PGCLIENTENCODING"] = "UTF8";
                     foreach (var a in args) psi.ArgumentList.Add(a);
 
-                    using var process = new Process { StartInfo = psi, EnableRaisingEvents = true };
-                    process.OutputDataReceived += (_, e) => { if (e.Data != null) Log(e.Data); };
-                    process.ErrorDataReceived += (_, e) => { if (e.Data != null) Log("[ERR] " + e.Data); };
+                    using var p = new Process { StartInfo = psi, EnableRaisingEvents = true };
+                    _runningProcess = p;
 
-                    process.Start();
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-                    process.WaitForExit();
+                    p.OutputDataReceived += (_, e) =>
+                    {
+                        if (e.Data == null) return;
+                        Log(e.Data);
+                    };
+                    p.ErrorDataReceived += (_, e) =>
+                    {
+                        if (e.Data == null) return;
+                        Log(e.Data, Color.Red);
+                    };
 
-                    Log($"{fileName} exited with code: {process.ExitCode}");
+                    p.Start();
+                    p.BeginOutputReadLine();
+                    p.BeginErrorReadLine();
+                    p.WaitForExit();
+
+                    Log($"{exe} exited with code: {p.ExitCode}", Color.DimGray);
                 }
                 catch (Exception ex)
                 {
-                    Log($"Error running {fileName}: {ex.Message}");
+                    Log($"Error running {exe}: {ex.Message}", Color.Red);
+                }
+                finally
+                {
+                    _runningProcess = null;
                 }
             });
         }
 
         // ---------- pg_restore progress ----------
-        private async Task RunPgRestoreWithProgressAsync(string exe, IEnumerable<string> args, int totalItems)
+        private async Task RunPgRestoreWithProgressAsync(string exe, IEnumerable<string> args, int total)
         {
             await Task.Run(() =>
             {
                 var regex = new Regex(@"processing item (\d+)/(\d+)", RegexOptions.IgnoreCase);
-
                 try
                 {
                     var psi = new ProcessStartInfo
@@ -353,6 +388,8 @@ namespace PgBackupRestoreTool
                     foreach (var a in args) psi.ArgumentList.Add(a);
 
                     using var p = new Process { StartInfo = psi };
+                    _runningProcess = p;
+
                     p.OutputDataReceived += (_, e) =>
                     {
                         if (e.Data == null) return;
@@ -361,7 +398,7 @@ namespace PgBackupRestoreTool
                         var m = regex.Match(e.Data);
                         if (m.Success && int.TryParse(m.Groups[1].Value, out int current))
                         {
-                            int percent = (int)(current * 100.0 / totalItems);
+                            int percent = (int)(current * 100.0 / total);
                             progressBar1.Invoke(new Action(() =>
                             {
                                 progressBar1.Style = ProgressBarStyle.Continuous;
@@ -369,21 +406,27 @@ namespace PgBackupRestoreTool
                             }));
                         }
                     };
-                    p.ErrorDataReceived += (_, e) => { if (e.Data != null) Log("[ERR] " + e.Data); };
+                    p.ErrorDataReceived += (_, e) =>
+                    {
+                        if (e.Data == null) return;
+                        Log(e.Data, Color.Red);
+                    };
 
                     p.Start();
                     p.BeginOutputReadLine();
                     p.BeginErrorReadLine();
                     p.WaitForExit();
-                    Log($"{exe} exited with code: {p.ExitCode}");
+
+                    Log($"{exe} exited with code: {p.ExitCode}", Color.DimGray);
                 }
                 catch (Exception ex)
                 {
-                    Log($"Error running {exe}: {ex.Message}");
+                    Log($"Error running {exe}: {ex.Message}", Color.Red);
                 }
                 finally
                 {
                     progressBar1.Invoke(new Action(() => progressBar1.Value = 100));
+                    _runningProcess = null;
                 }
             });
         }
@@ -409,19 +452,18 @@ namespace PgBackupRestoreTool
                     using var p = Process.Start(psi)!;
                     string output = p.StandardOutput.ReadToEnd();
                     p.WaitForExit();
-
-                    count = output.Split('\n').Count(line => !string.IsNullOrWhiteSpace(line));
+                    count = output.Split('\n').Count(l => !string.IsNullOrWhiteSpace(l));
                 }
                 catch (Exception ex)
                 {
-                    Log($"GetTocItemCountAsync error: {ex.Message}");
+                    Log($"GetTocItemCountAsync error: {ex.Message}", Color.Red);
                 }
             });
             return count;
         }
 
-        // ---------- Process (exit code only) ----------
-        private async Task<bool> RunProcessAndCheckSuccess(string fileName, IEnumerable<string> args)
+        // ---------- exit-code check ----------
+        private async Task<bool> RunProcessAndCheckSuccess(string exe, IEnumerable<string> args)
         {
             bool ok = false;
             await Task.Run(() =>
@@ -430,7 +472,7 @@ namespace PgBackupRestoreTool
                 {
                     var psi = new ProcessStartInfo
                     {
-                        FileName = fileName,
+                        FileName = exe,
                         RedirectStandardError = true,
                         UseShellExecute = false,
                         CreateNoWindow = true
@@ -445,17 +487,17 @@ namespace PgBackupRestoreTool
 
                     ok = p.ExitCode == 0;
                     if (!ok && !string.IsNullOrEmpty(err))
-                        Log("[ERR] " + err.Trim());
+                        Log(err.Trim(), Color.Red);
                 }
                 catch (Exception ex)
                 {
-                    Log($"RunProcessAndCheckSuccess error: {ex.Message}");
+                    Log($"RunProcessAndCheckSuccess error: {ex.Message}", Color.Red);
                 }
             });
             return ok;
         }
 
-        // ---------- 讀取 schema ----------
+        // ---------- load schema list ----------
         private async Task LoadSchemasAsync()
         {
             try
@@ -485,17 +527,19 @@ namespace PgBackupRestoreTool
                     comboBoxSchema.Enabled = true;
                     checkBoxClean.Enabled = true;
                     checkBoxDrop.Enabled = true;
+                    Log("Schema list loaded.", Color.Green);
                 }
                 else
                 {
                     comboBoxSchema.Enabled = false;
                     checkBoxClean.Enabled = false;
                     checkBoxDrop.Enabled = false;
+                    Log("No schema found.", Color.Orange);
                 }
             }
             catch (Exception ex)
             {
-                Log($"LoadSchemasAsync error: {ex.Message}");
+                Log($"LoadSchemasAsync error: {ex.Message}", Color.Red);
             }
         }
 
@@ -524,24 +568,33 @@ namespace PgBackupRestoreTool
                     p.WaitForExit();
 
                     if (!string.IsNullOrEmpty(err))
-                        Log("[ERR] " + err.Trim());
+                        Log(err.Trim(), Color.Red);
                 }
                 catch (Exception ex)
                 {
-                    Log($"RunProcessAndCaptureOutput error: {ex.Message}");
+                    Log($"RunProcessAndCaptureOutput error: {ex.Message}", Color.Red);
                 }
             });
             return result;
         }
 
         // ---------- Log ----------
-        private void Log(string msg)
+        private void Log(string message, Color? color = null)
         {
-            string line = $"{DateTime.Now:yyyy/MM/dd HH:mm:ss}: {msg}{Environment.NewLine}";
-            if (textBoxLog.InvokeRequired)
-                textBoxLog.Invoke(new Action(() => textBoxLog.AppendText(line)));
+            string line = $"{DateTime.Now:yyyy/MM/dd HH:mm:ss}: {message}{Environment.NewLine}";
+            void Append()
+            {
+                richTextBoxLog.SelectionStart = richTextBoxLog.TextLength;
+                richTextBoxLog.SelectionLength = 0;
+                richTextBoxLog.SelectionColor = color ?? Color.Black;
+                richTextBoxLog.AppendText(line);
+                richTextBoxLog.SelectionColor = richTextBoxLog.ForeColor;
+            }
+
+            if (richTextBoxLog.InvokeRequired)
+                richTextBoxLog.Invoke(new Action(Append));
             else
-                textBoxLog.AppendText(line);
+                Append();
         }
 
         // ---------- Config ----------
@@ -573,7 +626,7 @@ namespace PgBackupRestoreTool
             }
             catch (Exception ex)
             {
-                Log($"LoadConfig error: {ex.Message}");
+                Log($"LoadConfig error: {ex.Message}", Color.Red);
             }
         }
 
@@ -591,7 +644,7 @@ namespace PgBackupRestoreTool
             }
             catch (Exception ex)
             {
-                Log($"SaveConfig error: {ex.Message}");
+                Log($"SaveConfig error: {ex.Message}", Color.Red);
             }
         }
 
@@ -625,7 +678,7 @@ namespace PgBackupRestoreTool
                       AND pid <> pg_backend_pid();";
 
                 var args = new[] { "-U", PG_USER, "-h", host, "-p", port, "-d", PG_DATABASE, "-c", sql };
-                Log("Terminating other sessions...");
+                Log("Terminating other sessions...", Color.Blue);
                 await RunProcessStreamingAsync("psql", args);
             }
             finally
