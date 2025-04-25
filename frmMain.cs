@@ -65,7 +65,7 @@ namespace PgBackupRestoreTool
         }
 
         // ------------------------- 測試連線 -------------------------
-        private async void buttonTestConnection_Click(object sender, EventArgs e)
+        private async void buttonConnect_Click(object sender, EventArgs e)
         {
             ToggleControls(false);
             progressBar1.Style = ProgressBarStyle.Marquee;
@@ -230,13 +230,38 @@ namespace PgBackupRestoreTool
             }
             else            // -------- Plain SQL --------------
             {
-                // 清理 schema
-                if (checkBoxClean.Checked && comboBoxSchema.SelectedItem != null)
+                /* ① 讀取 UI 選項 */
+                bool doDrop = checkBoxDrop.Checked;   // 新增：只 DROP
+                bool doClean = checkBoxClean.Checked;  // 原本的 Clean(=Drop+Create)
+
+                /* ② 判斷是否需要處理 schema */
+                if ((doDrop || doClean) && comboBoxSchema.SelectedItem != null)
                 {
                     string schema = comboBoxSchema.SelectedItem.ToString();
-                    Log($"Dropping and recreating schema '{schema}'...");
 
-                    string dropSql = $"DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;";
+                    // ---- ③ 若要 DROP public，先二次確認 ----
+                    if ((doDrop || doClean) && schema.Equals("public", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var ans = MessageBox.Show(
+                            "You are about to DROP the default 'public' schema.\n" +
+                            "All objects inside will be removed. Do you want to continue?",
+                            "Confirm DROP public schema",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning);
+
+                        if (ans == DialogResult.No)
+                        {
+                            Log("User cancelled dropping the 'public' schema. Restore aborted.");
+                            return;                    // 直接結束 RestoreAsync；ButtonRestore_Click 的 finally 會把 UI 解鎖
+                        }
+                    }
+
+                    /* ④ 組裝 SQL（Clean = Drop + Create；Drop = 只有 Drop） */
+                    string dropSql = doClean
+                        ? $"DROP SCHEMA IF EXISTS \"{schema}\" CASCADE; CREATE SCHEMA \"{schema}\";"
+                        : $"DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;";
+
+                    Log($"{(doClean ? "Dropping & recreating" : "Dropping")} schema '{schema}'...");
 
                     var dropArgs = new[]
                     {
@@ -245,10 +270,13 @@ namespace PgBackupRestoreTool
                         "-p", port,
                         "-d", PG_DATABASE,
                         "-c", dropSql
-                    };
+                        };
                     await RunProcessAsync("psql", dropArgs);
                 }
 
+            SkipSchemaCleanup:
+
+                /* ⑤ 繼續還原 SQL 檔 */
                 Log("Starting restore using psql (Plain SQL)...");
                 var args = new[]
                 {
