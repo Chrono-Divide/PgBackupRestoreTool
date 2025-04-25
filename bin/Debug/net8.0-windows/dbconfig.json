@@ -1,0 +1,7 @@
+{
+  "ConnectionStrings": [
+    "Host=localhost;Port=5432;Username=admin;Password=admin;Database=bks",
+    "Host=192.168.11.109;Port=5432;Username=admin;Password=admin;Database=bks"
+  ],
+  "LastUsedConnection": "Host=localhost;Port=5432;Username=admin;Password=admin;Database=bks"
+}
