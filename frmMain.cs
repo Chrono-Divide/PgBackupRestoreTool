@@ -695,5 +695,21 @@ namespace PgBackupRestoreTool
             else if (sender == checkBoxDrop && checkBoxDrop.Checked)
                 checkBoxClean.Checked = false;
         }
+
+        private void textBoxRestoreFile_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Copy;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void textBoxRestoreFile_DragDrop(object sender, DragEventArgs e)
+        {
+            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files.Length > 0)
+                textBoxRestoreFile.Text = files[0];
+        }
+
     }
 }

@@ -22,7 +22,6 @@ namespace PgBackupRestoreTool
             labelConnectionString = new Label();
             comboBoxHost = new ComboBox();
             buttonConnect = new Button();
-
             groupBoxBackup = new GroupBox();
             labelBackupFile = new Label();
             textBoxBackupFile = new TextBox();
@@ -30,8 +29,9 @@ namespace PgBackupRestoreTool
             radioBackupPlain = new RadioButton();
             radioBackupCustom = new RadioButton();
             buttonBackup = new Button();
-
             groupBoxRestore = new GroupBox();
+            ButtonKillSessions = new Button();
+            checkBoxDrop = new CheckBox();
             labelRestoreFile = new Label();
             textBoxRestoreFile = new TextBox();
             buttonBrowseRestore = new Button();
@@ -40,16 +40,11 @@ namespace PgBackupRestoreTool
             labelSchema = new Label();
             comboBoxSchema = new ComboBox();
             checkBoxClean = new CheckBox();
-            checkBoxDrop = new CheckBox();
             buttonRestore = new Button();
-            ButtonKillSessions = new Button();
-
             richTextBoxLog = new RichTextBox();
-
             tableLayoutPanelStatus = new TableLayoutPanel();
             progressBar1 = new ProgressBar();
             buttonAbort = new Button();
-
             groupBoxConnection.SuspendLayout();
             groupBoxBackup.SuspendLayout();
             groupBoxRestore.SuspendLayout();
@@ -195,6 +190,28 @@ namespace PgBackupRestoreTool
             groupBoxRestore.TabStop = false;
             groupBoxRestore.Text = "Restore";
             // 
+            // ButtonKillSessions
+            // 
+            ButtonKillSessions.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            ButtonKillSessions.Location = new Point(779, 97);
+            ButtonKillSessions.Name = "ButtonKillSessions";
+            ButtonKillSessions.Size = new Size(90, 30);
+            ButtonKillSessions.TabIndex = 0;
+            ButtonKillSessions.Text = "Terminate";
+            ButtonKillSessions.UseVisualStyleBackColor = true;
+            ButtonKillSessions.Click += ButtonKillSessions_Click;
+            // 
+            // checkBoxDrop
+            // 
+            checkBoxDrop.AutoSize = true;
+            checkBoxDrop.Enabled = false;
+            checkBoxDrop.Location = new Point(301, 146);
+            checkBoxDrop.Name = "checkBoxDrop";
+            checkBoxDrop.Size = new Size(171, 19);
+            checkBoxDrop.TabIndex = 1;
+            checkBoxDrop.Text = "Drop schema before restore";
+            checkBoxDrop.CheckedChanged += CheckBoxMutualExclusive;
+            // 
             // labelRestoreFile
             // 
             labelRestoreFile.AutoSize = true;
@@ -206,11 +223,14 @@ namespace PgBackupRestoreTool
             // 
             // textBoxRestoreFile
             // 
+            textBoxRestoreFile.AllowDrop = true;
             textBoxRestoreFile.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textBoxRestoreFile.Location = new Point(120, 30);
             textBoxRestoreFile.Name = "textBoxRestoreFile";
             textBoxRestoreFile.Size = new Size(653, 23);
             textBoxRestoreFile.TabIndex = 3;
+            textBoxRestoreFile.DragDrop += textBoxRestoreFile_DragDrop;
+            textBoxRestoreFile.DragEnter += textBoxRestoreFile_DragEnter;
             // 
             // buttonBrowseRestore
             // 
@@ -274,28 +294,6 @@ namespace PgBackupRestoreTool
             checkBoxClean.Text = "Clean schema before restore";
             checkBoxClean.CheckedChanged += CheckBoxMutualExclusive;
             // 
-            // checkBoxDrop
-            // 
-            checkBoxDrop.AutoSize = true;
-            checkBoxDrop.Enabled = false;
-            checkBoxDrop.Location = new Point(301, 146);
-            checkBoxDrop.Name = "checkBoxDrop";
-            checkBoxDrop.Size = new Size(171, 19);
-            checkBoxDrop.TabIndex = 1;
-            checkBoxDrop.Text = "Drop schema before restore";
-            checkBoxDrop.CheckedChanged += CheckBoxMutualExclusive;
-            // 
-            // ButtonKillSessions
-            // 
-            ButtonKillSessions.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            ButtonKillSessions.Location = new Point(779, 97);
-            ButtonKillSessions.Name = "ButtonKillSessions";
-            ButtonKillSessions.Size = new Size(90, 30);
-            ButtonKillSessions.TabIndex = 0;
-            ButtonKillSessions.Text = "Terminate";
-            ButtonKillSessions.UseVisualStyleBackColor = true;
-            ButtonKillSessions.Click += ButtonKillSessions_Click;
-            // 
             // buttonRestore
             // 
             buttonRestore.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -323,7 +321,9 @@ namespace PgBackupRestoreTool
             tableLayoutPanelStatus.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tableLayoutPanelStatus.ColumnCount = 2;
             tableLayoutPanelStatus.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanelStatus.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            tableLayoutPanelStatus.ColumnStyles.Add(new ColumnStyle());
+            tableLayoutPanelStatus.Controls.Add(progressBar1, 0, 0);
+            tableLayoutPanelStatus.Controls.Add(buttonAbort, 1, 0);
             tableLayoutPanelStatus.Location = new Point(10, 607);
             tableLayoutPanelStatus.Name = "tableLayoutPanelStatus";
             tableLayoutPanelStatus.RowCount = 1;
@@ -334,27 +334,22 @@ namespace PgBackupRestoreTool
             // progressBar1
             // 
             progressBar1.Dock = DockStyle.Fill;
-            progressBar1.Location = new Point(0, 0);
+            progressBar1.Location = new Point(3, 3);
             progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(779, 35);
+            progressBar1.Size = new Size(777, 29);
             progressBar1.TabIndex = 0;
             // 
             // buttonAbort
             // 
             buttonAbort.Anchor = AnchorStyles.Right;
             buttonAbort.Enabled = false;
-            buttonAbort.Location = new Point(0, 0);
+            buttonAbort.Location = new Point(786, 3);
             buttonAbort.Name = "buttonAbort";
-            buttonAbort.Size = new Size(90, 35);
+            buttonAbort.Size = new Size(90, 29);
             buttonAbort.TabIndex = 1;
             buttonAbort.Text = "Abort";
             buttonAbort.UseVisualStyleBackColor = true;
             buttonAbort.Click += buttonAbort_Click;
-            // 
-            // Add controls to tableLayoutPanelStatus
-            // 
-            tableLayoutPanelStatus.Controls.Add(progressBar1, 0, 0);
-            tableLayoutPanelStatus.Controls.Add(buttonAbort, 1, 0);
             // 
             // frmMain
             // 
