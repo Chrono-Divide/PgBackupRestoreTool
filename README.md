@@ -1,30 +1,32 @@
 # PgBackupRestoreTool
 
-**PgBackupRestoreTool** is a lightweight GUI tool built with **.NET 8** for backing up and restoring PostgreSQL databases using official client tools (`pg_dump`, `pg_restore`, `psql`, etc). It supports both local and remote PostgreSQL connections.
+**PgBackupRestoreTool** is a lightweight GUI tool built with **.NET 8** for backing up and restoring PostgreSQL databases using the official client tools (`pg_dump`, `pg_restore`, `psql`, etc). It supports both local and remote PostgreSQL connections.
 
 ## 🚀 Features
 
-- 📦 Backup database with:
+- 📦 **Backup** database with:
   - Custom format (`pg_dump -F c`)
   - Plain SQL format (`pg_dump` default)
-- ♻️ Restore database from:
+- ♻️ **Restore** database from:
   - Custom format (`pg_restore`)
   - Plain SQL format (`psql`)
-- 🖥️ Local or remote host selection
-- 📂 File browsing support for backup/restore files
-- ✅ Test database connection
-- 🔒 Auto-disables UI controls during long operations to prevent conflicts
+- 🖱️ **Drag & drop** support: drop a file onto the Restore-file textbox to auto-populate the path
+- 🗜️ **Improved status bar layout** with a `TableLayoutPanel` to keep consistent spacing between the progress bar and Abort button
+- 🖥️ Local or remote host selection via connection‐string dropdown
+- 📂 File‐browsing dialogs for both backup and restore paths
+- ✅ Connection‐test button to verify credentials
+- 🔒 UI controls auto‐disable during long‐running operations to prevent conflicts
 - 🌐 Automatically sets `PGCLIENTENCODING=UTF8` for proper encoding
-- 📝 Settings saved in local `settings.conf` file
+- 💾 **Configuration** persisted to `dbconfig.json` (instead of an INI file)
 
 ## 🧰 Requirements
 
-- Windows with [.NET 8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed
+- Windows with [.NET 8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed  
 - PostgreSQL client tools must be installed and available in your system `PATH`:
   - `pg_dump`
   - `pg_restore`
   - `psql`
-  - `dropdb`, `createdb`
+  - (optional) `dropdb`, `createdb` for schema operations
 
 ## 🧑‍💻 How to Use
 
@@ -32,43 +34,45 @@
 
 ```bash
 git clone https://github.com/Chrono-Divide/PgBackupRestoreTool.git
+cd PgBackupRestoreTool
 ```
 
 ### 2. Build and Run
 
-Open the solution in Visual Studio 2022+ or use the command line:
+Open the solution in Visual Studio 2022+ or use the .NET CLI:
 
 ```bash
 dotnet build
 dotnet run --project PgBackupRestoreTool
 ```
 
-> You can also publish it as a standalone `.exe` using:
->
+> To publish as a standalone executable:
+> 
 > ```bash
 > dotnet publish -c Release -r win-x64 --self-contained true
 > ```
 
 ### 3. Initial Configuration
 
-On first run, a `settings.conf` file will be created alongside the `.exe`. You can manually edit it to configure database credentials and known IPs.
+On first run, a `dbconfig.json` file will be created in the application folder. You can edit it manually or let the UI save new connection strings.
 
-#### `settings.conf` example:
+#### `dbconfig.json` example
 
-```ini
-PG_USER=admin
-PG_PASSWORD=admin
-PG_DATABASE=bks
-KNOWN_IPS=192.168.1.100;192.168.1.101
+```json
+{
+  "ConnectionStrings": [
+    "Host=localhost;Port=5432;Username=admin;Password=admin;Database=bks"
+  ],
+  "LastUsedConnection": "Host=localhost;Port=5432;Username=admin;Password=admin;Database=bks"
+}
 ```
 
-> ⚠️ The default `settings.conf` is empty. You must edit it manually or use the UI to save new IPs via "Test Connection".
+- **ConnectionStrings**: list of known connection‐string entries  
+- **LastUsedConnection**: which entry was last tested/saved
 
 ## 📸 Screenshot
 
-> _Optional: You can place a screenshot in `docs/screenshot.png` and uncomment this line._
-
-<!-- ![Screenshot](docs/screenshot.png) -->
+![Screenshot](screenshot.png) 
 
 ## 📝 License
 
