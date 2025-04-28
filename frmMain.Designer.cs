@@ -18,7 +18,6 @@ namespace PgBackupRestoreTool
         #region Windows Form Designer generated code
         private void InitializeComponent()
         {
-            // --------- 主分區 ---------
             groupBoxConnection = new GroupBox();
             labelConnectionString = new Label();
             comboBoxHost = new ComboBox();
@@ -47,14 +46,18 @@ namespace PgBackupRestoreTool
 
             richTextBoxLog = new RichTextBox();
 
-            // --------- 底部 Panel（ProgressBar + Abort）---------
-            panelStatus = new Panel();
+            tableLayoutPanelStatus = new TableLayoutPanel();
             progressBar1 = new ProgressBar();
             buttonAbort = new Button();
 
+            groupBoxConnection.SuspendLayout();
+            groupBoxBackup.SuspendLayout();
+            groupBoxRestore.SuspendLayout();
+            tableLayoutPanelStatus.SuspendLayout();
             SuspendLayout();
-
-            // ========== groupBoxConnection ==========
+            // 
+            // groupBoxConnection
+            // 
             groupBoxConnection.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBoxConnection.Controls.Add(labelConnectionString);
             groupBoxConnection.Controls.Add(comboBoxHost);
@@ -65,27 +68,37 @@ namespace PgBackupRestoreTool
             groupBoxConnection.TabIndex = 0;
             groupBoxConnection.TabStop = false;
             groupBoxConnection.Text = "Connection";
-
+            // 
+            // labelConnectionString
+            // 
             labelConnectionString.AutoSize = true;
             labelConnectionString.Location = new Point(10, 30);
             labelConnectionString.Name = "labelConnectionString";
             labelConnectionString.Size = new Size(104, 15);
+            labelConnectionString.TabIndex = 0;
             labelConnectionString.Text = "Connection string:";
-
+            // 
+            // comboBoxHost
+            // 
             comboBoxHost.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             comboBoxHost.Location = new Point(120, 27);
             comboBoxHost.Name = "comboBoxHost";
-            comboBoxHost.Size = new Size(647, 23);
-
+            comboBoxHost.Size = new Size(653, 23);
+            comboBoxHost.TabIndex = 1;
+            // 
+            // buttonConnect
+            // 
             buttonConnect.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonConnect.Location = new Point(775, 25);
+            buttonConnect.Location = new Point(779, 25);
             buttonConnect.Name = "buttonConnect";
             buttonConnect.Size = new Size(90, 27);
+            buttonConnect.TabIndex = 2;
             buttonConnect.Text = "Connect";
             buttonConnect.UseVisualStyleBackColor = true;
             buttonConnect.Click += buttonConnect_Click;
-
-            // ========== groupBoxBackup ==========
+            // 
+            // groupBoxBackup
+            // 
             groupBoxBackup.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBoxBackup.Controls.Add(labelBackupFile);
             groupBoxBackup.Controls.Add(textBoxBackupFile);
@@ -97,41 +110,71 @@ namespace PgBackupRestoreTool
             groupBoxBackup.Location = new Point(10, 90);
             groupBoxBackup.Name = "groupBoxBackup";
             groupBoxBackup.Size = new Size(879, 120);
+            groupBoxBackup.TabIndex = 3;
             groupBoxBackup.TabStop = false;
             groupBoxBackup.Text = "Backup";
-
+            // 
+            // labelBackupFile
+            // 
             labelBackupFile.AutoSize = true;
             labelBackupFile.Location = new Point(10, 34);
+            labelBackupFile.Name = "labelBackupFile";
+            labelBackupFile.Size = new Size(68, 15);
+            labelBackupFile.TabIndex = 0;
             labelBackupFile.Text = "Backup file:";
-
+            // 
+            // textBoxBackupFile
+            // 
             textBoxBackupFile.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textBoxBackupFile.Location = new Point(120, 30);
-            textBoxBackupFile.Size = new Size(647, 23);
-
+            textBoxBackupFile.Name = "textBoxBackupFile";
+            textBoxBackupFile.Size = new Size(653, 23);
+            textBoxBackupFile.TabIndex = 1;
+            // 
+            // buttonBrowseBackup
+            // 
             buttonBrowseBackup.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonBrowseBackup.Location = new Point(775, 28);
+            buttonBrowseBackup.Location = new Point(779, 28);
+            buttonBrowseBackup.Name = "buttonBrowseBackup";
             buttonBrowseBackup.Size = new Size(90, 27);
+            buttonBrowseBackup.TabIndex = 2;
             buttonBrowseBackup.Text = "Browse...";
             buttonBrowseBackup.UseVisualStyleBackColor = true;
             buttonBrowseBackup.Click += ButtonBrowseBackup_Click;
-
+            // 
+            // radioBackupPlain
+            // 
             radioBackupPlain.AutoSize = true;
             radioBackupPlain.Checked = true;
             radioBackupPlain.Location = new Point(155, 77);
+            radioBackupPlain.Name = "radioBackupPlain";
+            radioBackupPlain.Size = new Size(104, 19);
+            radioBackupPlain.TabIndex = 3;
+            radioBackupPlain.TabStop = true;
             radioBackupPlain.Text = "Plain SQL (.sql)";
-
+            // 
+            // radioBackupCustom
+            // 
             radioBackupCustom.AutoSize = true;
             radioBackupCustom.Location = new Point(301, 77);
+            radioBackupCustom.Name = "radioBackupCustom";
+            radioBackupCustom.Size = new Size(134, 19);
+            radioBackupCustom.TabIndex = 4;
             radioBackupCustom.Text = "Custom format (-F c)";
-
+            // 
+            // buttonBackup
+            // 
             buttonBackup.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonBackup.Location = new Point(775, 71);
+            buttonBackup.Location = new Point(779, 71);
+            buttonBackup.Name = "buttonBackup";
             buttonBackup.Size = new Size(90, 30);
+            buttonBackup.TabIndex = 5;
             buttonBackup.Text = "Backup";
             buttonBackup.UseVisualStyleBackColor = true;
             buttonBackup.Click += ButtonBackup_Click;
-
-            // ========== groupBoxRestore ==========
+            // 
+            // groupBoxRestore
+            // 
             groupBoxRestore.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBoxRestore.Controls.Add(ButtonKillSessions);
             groupBoxRestore.Controls.Add(checkBoxDrop);
@@ -148,114 +191,190 @@ namespace PgBackupRestoreTool
             groupBoxRestore.Location = new Point(10, 216);
             groupBoxRestore.Name = "groupBoxRestore";
             groupBoxRestore.Size = new Size(879, 180);
+            groupBoxRestore.TabIndex = 2;
             groupBoxRestore.TabStop = false;
             groupBoxRestore.Text = "Restore";
-
+            // 
+            // labelRestoreFile
+            // 
             labelRestoreFile.AutoSize = true;
             labelRestoreFile.Location = new Point(10, 33);
+            labelRestoreFile.Name = "labelRestoreFile";
+            labelRestoreFile.Size = new Size(68, 15);
+            labelRestoreFile.TabIndex = 2;
             labelRestoreFile.Text = "Backup file:";
-
+            // 
+            // textBoxRestoreFile
+            // 
             textBoxRestoreFile.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textBoxRestoreFile.Location = new Point(120, 30);
-            textBoxRestoreFile.Size = new Size(647, 23);
-
+            textBoxRestoreFile.Name = "textBoxRestoreFile";
+            textBoxRestoreFile.Size = new Size(653, 23);
+            textBoxRestoreFile.TabIndex = 3;
+            // 
+            // buttonBrowseRestore
+            // 
             buttonBrowseRestore.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonBrowseRestore.Location = new Point(775, 28);
+            buttonBrowseRestore.Location = new Point(779, 28);
+            buttonBrowseRestore.Name = "buttonBrowseRestore";
             buttonBrowseRestore.Size = new Size(90, 27);
+            buttonBrowseRestore.TabIndex = 4;
             buttonBrowseRestore.Text = "Browse...";
             buttonBrowseRestore.UseVisualStyleBackColor = true;
             buttonBrowseRestore.Click += ButtonBrowseRestore_Click;
-
+            // 
+            // radioRestorePlain
+            // 
             radioRestorePlain.AutoSize = true;
             radioRestorePlain.Checked = true;
             radioRestorePlain.Location = new Point(155, 66);
+            radioRestorePlain.Name = "radioRestorePlain";
+            radioRestorePlain.Size = new Size(104, 19);
+            radioRestorePlain.TabIndex = 5;
+            radioRestorePlain.TabStop = true;
             radioRestorePlain.Text = "Plain SQL (.sql)";
-
+            // 
+            // radioRestoreCustom
+            // 
             radioRestoreCustom.AutoSize = true;
             radioRestoreCustom.Location = new Point(301, 66);
+            radioRestoreCustom.Name = "radioRestoreCustom";
+            radioRestoreCustom.Size = new Size(134, 19);
+            radioRestoreCustom.TabIndex = 6;
             radioRestoreCustom.Text = "Custom format (-F c)";
-
+            // 
+            // labelSchema
+            // 
             labelSchema.AutoSize = true;
             labelSchema.Location = new Point(10, 103);
+            labelSchema.Name = "labelSchema";
+            labelSchema.Size = new Size(51, 15);
+            labelSchema.TabIndex = 7;
             labelSchema.Text = "Schema:";
-
+            // 
+            // comboBoxSchema
+            // 
             comboBoxSchema.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             comboBoxSchema.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxSchema.Enabled = false;
             comboBoxSchema.Location = new Point(120, 100);
-            comboBoxSchema.Size = new Size(647, 23);
+            comboBoxSchema.Name = "comboBoxSchema";
+            comboBoxSchema.Size = new Size(653, 23);
+            comboBoxSchema.TabIndex = 8;
             comboBoxSchema.SelectedIndexChanged += ComboBoxSchema_SelectedIndexChanged;
-
+            // 
+            // checkBoxClean
+            // 
             checkBoxClean.AutoSize = true;
             checkBoxClean.Enabled = false;
             checkBoxClean.Location = new Point(120, 146);
+            checkBoxClean.Name = "checkBoxClean";
+            checkBoxClean.Size = new Size(174, 19);
+            checkBoxClean.TabIndex = 9;
             checkBoxClean.Text = "Clean schema before restore";
             checkBoxClean.CheckedChanged += CheckBoxMutualExclusive;
-
+            // 
+            // checkBoxDrop
+            // 
             checkBoxDrop.AutoSize = true;
             checkBoxDrop.Enabled = false;
             checkBoxDrop.Location = new Point(301, 146);
+            checkBoxDrop.Name = "checkBoxDrop";
+            checkBoxDrop.Size = new Size(171, 19);
+            checkBoxDrop.TabIndex = 1;
             checkBoxDrop.Text = "Drop schema before restore";
             checkBoxDrop.CheckedChanged += CheckBoxMutualExclusive;
-
-            buttonRestore.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonRestore.Location = new Point(775, 139);
-            buttonRestore.Size = new Size(90, 30);
-            buttonRestore.Text = "Restore";
-            buttonRestore.UseVisualStyleBackColor = true;
-            buttonRestore.Click += ButtonRestore_Click;
-
+            // 
+            // ButtonKillSessions
+            // 
             ButtonKillSessions.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            ButtonKillSessions.Location = new Point(775, 97);
+            ButtonKillSessions.Location = new Point(779, 97);
+            ButtonKillSessions.Name = "ButtonKillSessions";
             ButtonKillSessions.Size = new Size(90, 30);
+            ButtonKillSessions.TabIndex = 0;
             ButtonKillSessions.Text = "Terminate";
             ButtonKillSessions.UseVisualStyleBackColor = true;
             ButtonKillSessions.Click += ButtonKillSessions_Click;
-
-            // ========== richTextBoxLog ==========
+            // 
+            // buttonRestore
+            // 
+            buttonRestore.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonRestore.Location = new Point(779, 139);
+            buttonRestore.Name = "buttonRestore";
+            buttonRestore.Size = new Size(90, 30);
+            buttonRestore.TabIndex = 10;
+            buttonRestore.Text = "Restore";
+            buttonRestore.UseVisualStyleBackColor = true;
+            buttonRestore.Click += ButtonRestore_Click;
+            // 
+            // richTextBoxLog
+            // 
             richTextBoxLog.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             richTextBoxLog.Location = new Point(10, 402);
             richTextBoxLog.Name = "richTextBoxLog";
             richTextBoxLog.ReadOnly = true;
             richTextBoxLog.Size = new Size(879, 200);
+            richTextBoxLog.TabIndex = 1;
+            richTextBoxLog.Text = "";
             richTextBoxLog.WordWrap = false;
-
-            // ========== panelStatus ==========
-            panelStatus.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panelStatus.Location = new Point(10, 607);
-            panelStatus.Name = "panelStatus";
-            panelStatus.Size = new Size(879, 35);
-
+            // 
+            // tableLayoutPanelStatus
+            // 
+            tableLayoutPanelStatus.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tableLayoutPanelStatus.ColumnCount = 2;
+            tableLayoutPanelStatus.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanelStatus.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            tableLayoutPanelStatus.Location = new Point(10, 607);
+            tableLayoutPanelStatus.Name = "tableLayoutPanelStatus";
+            tableLayoutPanelStatus.RowCount = 1;
+            tableLayoutPanelStatus.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanelStatus.Size = new Size(879, 35);
+            tableLayoutPanelStatus.TabIndex = 0;
+            // 
             // progressBar1
+            // 
             progressBar1.Dock = DockStyle.Fill;
+            progressBar1.Location = new Point(0, 0);
             progressBar1.Name = "progressBar1";
-
+            progressBar1.Size = new Size(779, 35);
+            progressBar1.TabIndex = 0;
+            // 
             // buttonAbort
-            buttonAbort.Dock = DockStyle.Right;
+            // 
+            buttonAbort.Anchor = AnchorStyles.Right;
             buttonAbort.Enabled = false;
+            buttonAbort.Location = new Point(0, 0);
             buttonAbort.Name = "buttonAbort";
-            buttonAbort.Size = new Size(100, 35);
+            buttonAbort.Size = new Size(90, 35);
+            buttonAbort.TabIndex = 1;
             buttonAbort.Text = "Abort";
             buttonAbort.UseVisualStyleBackColor = true;
             buttonAbort.Click += buttonAbort_Click;
-
-            panelStatus.Controls.Add(progressBar1);
-            panelStatus.Controls.Add(buttonAbort);
-
-            // ========== frmMain ==========
+            // 
+            // Add controls to tableLayoutPanelStatus
+            // 
+            tableLayoutPanelStatus.Controls.Add(progressBar1, 0, 0);
+            tableLayoutPanelStatus.Controls.Add(buttonAbort, 1, 0);
+            // 
+            // frmMain
+            // 
             AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(900, 652);
-            Controls.Add(panelStatus);
+            Controls.Add(tableLayoutPanelStatus);
             Controls.Add(richTextBoxLog);
             Controls.Add(groupBoxRestore);
             Controls.Add(groupBoxBackup);
             Controls.Add(groupBoxConnection);
-            FormBorderStyle = FormBorderStyle.Sizable;
-            MaximizeBox = true;
             Name = "frmMain";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "PostgreSQL Backup/Restore Tool";
-
+            groupBoxConnection.ResumeLayout(false);
+            groupBoxConnection.PerformLayout();
+            groupBoxBackup.ResumeLayout(false);
+            groupBoxBackup.PerformLayout();
+            groupBoxRestore.ResumeLayout(false);
+            groupBoxRestore.PerformLayout();
+            tableLayoutPanelStatus.ResumeLayout(false);
             ResumeLayout(false);
         }
         #endregion
@@ -288,7 +407,7 @@ namespace PgBackupRestoreTool
 
         private RichTextBox richTextBoxLog;
 
-        private Panel panelStatus;
+        private TableLayoutPanel tableLayoutPanelStatus;
         private ProgressBar progressBar1;
         private Button buttonAbort;
     }
