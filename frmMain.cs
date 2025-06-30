@@ -105,7 +105,7 @@ namespace PgBackupRestoreTool
             {
                 PrepareConnectionInfo(out string host, out string port);
                 var args = new[] { "-U", PG_USER, "-h", host, "-p", port, "-l" };
-                bool success = await RunProcessAndCheckSuccessAsync("psql", args);
+                bool success = await RunProcessAndCheckSuccessAsync("psql", args, logStdOut: false);
 
                 if (success)
                 {
@@ -463,7 +463,7 @@ namespace PgBackupRestoreTool
         }
 
         // ---------- exit-code check ----------
-        private async Task<bool> RunProcessAndCheckSuccessAsync(string exe, IEnumerable<string> args)
+        private async Task<bool> RunProcessAndCheckSuccessAsync(string exe, IEnumerable<string> args, bool logStdOut = true)
         {
             try
             {
@@ -479,7 +479,7 @@ namespace PgBackupRestoreTool
                 psi.Environment["PGPASSWORD"] = PG_PASSWORD;
                 psi.Environment["PGCLIENTENCODING"] = "UTF8";
 
-                psi.ArgumentList.Add("-w");                 // no-password prompt
+                psi.ArgumentList.Add("-w");
                 foreach (var a in args) psi.ArgumentList.Add(a);
 
                 using var p = Process.Start(psi)!;
@@ -488,7 +488,7 @@ namespace PgBackupRestoreTool
                 var errTask = p.StandardError.ReadToEndAsync();
                 await Task.WhenAll(stdTask, errTask, p.WaitForExitAsync());
 
-                if (!string.IsNullOrWhiteSpace(stdTask.Result))
+                if (logStdOut && !string.IsNullOrWhiteSpace(stdTask.Result))
                     Log(stdTask.Result.Trim(), Color.Black);
 
                 if (p.ExitCode != 0 && !string.IsNullOrWhiteSpace(errTask.Result))
@@ -502,7 +502,6 @@ namespace PgBackupRestoreTool
                 return false;
             }
         }
-
 
         // ---------- load schema list ----------
         private async Task LoadSchemasAsync()
@@ -588,20 +587,28 @@ namespace PgBackupRestoreTool
         // ---------- Log ----------
         private void Log(string message, Color? color = null)
         {
-            string line = $"{DateTime.Now:yyyy/MM/dd HH:mm:ss}: {message}{Environment.NewLine}";
-            void Append()
-            {
-                richTextBoxLog.SelectionStart = richTextBoxLog.TextLength;
-                richTextBoxLog.SelectionLength = 0;
-                richTextBoxLog.SelectionColor = color ?? Color.Black;
-                richTextBoxLog.AppendText(line);
-                richTextBoxLog.SelectionColor = richTextBoxLog.ForeColor;
-            }
+            string[] lines = message.Replace("\r", "").Split('\n');
+            if (lines.Length == 0) return;
 
-            if (richTextBoxLog.InvokeRequired)
-                richTextBoxLog.Invoke(new Action(Append));
-            else
-                Append();
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string lineText = i == 0 ? lines[i] : "    " + lines[i];
+                string line = $"{DateTime.Now:yyyy/MM/dd HH:mm:ss}: {lineText}{Environment.NewLine}";
+
+                void Append()
+                {
+                    richTextBoxLog.SelectionStart = richTextBoxLog.TextLength;
+                    richTextBoxLog.SelectionLength = 0;
+                    richTextBoxLog.SelectionColor = color ?? Color.Black;
+                    richTextBoxLog.AppendText(line);
+                    richTextBoxLog.SelectionColor = richTextBoxLog.ForeColor;
+                }
+
+                if (richTextBoxLog.InvokeRequired)
+                    richTextBoxLog.Invoke(new Action(Append));
+                else
+                    Append();
+            }
         }
 
         // ---------- Config ----------
@@ -717,6 +724,5 @@ namespace PgBackupRestoreTool
             if (files.Length > 0)
                 textBoxRestoreFile.Text = files[0];
         }
-
     }
 }
