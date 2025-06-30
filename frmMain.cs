@@ -105,7 +105,7 @@ namespace PgBackupRestoreTool
             {
                 PrepareConnectionInfo(out string host, out string port);
                 var args = new[] { "-U", PG_USER, "-h", host, "-p", port, "-l" };
-                bool success = await RunProcessAndCheckSuccess("psql", args);
+                bool success = await RunProcessAndCheckSuccessAsync("psql", args);
 
                 if (success)
                 {
@@ -463,39 +463,46 @@ namespace PgBackupRestoreTool
         }
 
         // ---------- exit-code check ----------
-        private async Task<bool> RunProcessAndCheckSuccess(string exe, IEnumerable<string> args)
+        private async Task<bool> RunProcessAndCheckSuccessAsync(string exe, IEnumerable<string> args)
         {
-            bool ok = false;
-            await Task.Run(() =>
+            try
             {
-                try
+                var psi = new ProcessStartInfo
                 {
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = exe,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-                    psi.Environment["PGPASSWORD"] = PG_PASSWORD;
-                    psi.Environment["PGCLIENTENCODING"] = "UTF8";
-                    foreach (var a in args) psi.ArgumentList.Add(a);
+                    FileName = exe,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
 
-                    using var p = Process.Start(psi)!;
-                    string err = p.StandardError.ReadToEnd();
-                    p.WaitForExit();
+                psi.Environment["PGPASSWORD"] = PG_PASSWORD;
+                psi.Environment["PGCLIENTENCODING"] = "UTF8";
 
-                    ok = p.ExitCode == 0;
-                    if (!ok && !string.IsNullOrEmpty(err))
-                        Log(err.Trim(), Color.Red);
-                }
-                catch (Exception ex)
-                {
-                    Log($"RunProcessAndCheckSuccess error: {ex.Message}", Color.Red);
-                }
-            });
-            return ok;
+                psi.ArgumentList.Add("-w");                 // no-password prompt
+                foreach (var a in args) psi.ArgumentList.Add(a);
+
+                using var p = Process.Start(psi)!;
+
+                var stdTask = p.StandardOutput.ReadToEndAsync();
+                var errTask = p.StandardError.ReadToEndAsync();
+                await Task.WhenAll(stdTask, errTask, p.WaitForExitAsync());
+
+                if (!string.IsNullOrWhiteSpace(stdTask.Result))
+                    Log(stdTask.Result.Trim(), Color.Black);
+
+                if (p.ExitCode != 0 && !string.IsNullOrWhiteSpace(errTask.Result))
+                    Log(errTask.Result.Trim(), Color.Red);
+
+                return p.ExitCode == 0;
+            }
+            catch (Exception ex)
+            {
+                Log($"RunProcessAndCheckSuccessAsync error: {ex.Message}", Color.Red);
+                return false;
+            }
         }
+
 
         // ---------- load schema list ----------
         private async Task LoadSchemasAsync()
