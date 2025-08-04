@@ -142,7 +142,7 @@ namespace PgBackupRestoreTool
             using var sfd = new SaveFileDialog
             {
                 Title = "Choose backup file path to save",
-                Filter = "Dump File (*.dump)|*.dump|SQL File (*.sql)|*.sql|All Files (*.*)|*.*",
+                Filter = "Dump File (*.dump;*.dmp)|*.dump;*.dmp|SQL File (*.sql)|*.sql|All Files (*.*)|*.*",
                 InitialDirectory = lastDirectory
             };
             if (sfd.ShowDialog() == DialogResult.OK)
@@ -157,7 +157,7 @@ namespace PgBackupRestoreTool
             using var ofd = new OpenFileDialog
             {
                 Title = "Select a backup file to restore",
-                Filter = "Dump File (*.dump)|*.dump|SQL File (*.sql)|*.sql|All Files (*.*)|*.*",
+                Filter = "Dump File (*.dump;*.dmp)|*.dump;*.dmp|SQL File (*.sql)|*.sql|All Files (*.*)|*.*",
                 InitialDirectory = lastDirectory
             };
             if (ofd.ShowDialog() == DialogResult.OK)
