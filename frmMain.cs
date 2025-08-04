@@ -104,8 +104,17 @@ namespace PgBackupRestoreTool
             try
             {
                 PrepareConnectionInfo(out string host, out string port);
-                var args = new[] { "-U", PG_USER, "-h", host, "-p", port, "-l" };
-                bool success = await RunProcessAndCheckSuccessAsync("psql", args, logStdOut: false);
+                string db = GetEffectiveDatabase();
+
+                await RunProcessAndCheckSuccessAsync("psql", new[] { "--version" });
+
+                var args = new[]
+                {
+                    "-U", PG_USER, "-h", host, "-p", port,
+                    "-d", db, "-t", "-A", "-c", "SELECT version();"
+                };
+                bool success = await RunProcessAndCheckSuccessAsync("psql", args, logStdOut: true);
+
 
                 if (success)
                 {
@@ -515,11 +524,13 @@ namespace PgBackupRestoreTool
                              "WHERE schema_name NOT IN ('pg_catalog','information_schema') " +
                              "ORDER BY schema_name;";
 
+                string db = GetEffectiveDatabase();
                 var args = new[]
                 {
-                    "-U", PG_USER, "-h", host, "-p", port,
-                    "-d", PG_DATABASE, "-t", "-c", sql
+                 "-U", PG_USER, "-h", host, "-p", port,
+                 "-d", db, "-t", "-c", sql
                 };
+
                 string output = await RunProcessAndCaptureOutput("psql", args);
 
                 var schemas = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
@@ -724,5 +735,11 @@ namespace PgBackupRestoreTool
             if (files.Length > 0)
                 textBoxRestoreFile.Text = files[0];
         }
+
+        private string GetEffectiveDatabase()
+        {
+            return string.IsNullOrWhiteSpace(PG_DATABASE) ? "postgres" : PG_DATABASE;
+        }
+
     }
 }
