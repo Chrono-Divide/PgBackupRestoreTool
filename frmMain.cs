@@ -68,6 +68,18 @@ namespace PgBackupRestoreTool
             checkBoxDrop.Enabled = enable;
         }
 
+        private void RestoreFormatChanged(object? sender, EventArgs e)
+        {
+            bool isPlain = radioRestorePlain.Checked;
+            comboBoxSchema.Enabled = isPlain && comboBoxSchema.Items.Count > 0;
+            ComboBoxSchema_SelectedIndexChanged(null, EventArgs.Empty);
+            if (!isPlain)
+            {
+                checkBoxClean.Checked = false;
+                checkBoxDrop.Checked = false;
+            }
+        }
+
         private void EnableAbort(bool enable)
         {
             if (buttonAbort.InvokeRequired)
@@ -553,6 +565,7 @@ namespace PgBackupRestoreTool
                     checkBoxDrop.Enabled = false;
                     Log("No schema found.", Color.Orange);
                 }
+                RestoreFormatChanged(null, EventArgs.Empty);
             }
             catch (Exception ex)
             {

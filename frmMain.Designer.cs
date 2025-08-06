@@ -253,18 +253,20 @@ namespace PgBackupRestoreTool
             radioRestorePlain.TabIndex = 5;
             radioRestorePlain.TabStop = true;
             radioRestorePlain.Text = "Plain SQL (.sql)";
-            // 
+            radioRestorePlain.CheckedChanged += RestoreFormatChanged;
+            //
             // radioRestoreCustom
-            // 
+            //
             radioRestoreCustom.AutoSize = true;
             radioRestoreCustom.Location = new Point(301, 66);
             radioRestoreCustom.Name = "radioRestoreCustom";
             radioRestoreCustom.Size = new Size(134, 19);
             radioRestoreCustom.TabIndex = 6;
             radioRestoreCustom.Text = "Custom format (-F c)";
-            // 
+            radioRestoreCustom.CheckedChanged += RestoreFormatChanged;
+            //
             // labelSchema
-            // 
+            //
             labelSchema.AutoSize = true;
             labelSchema.Location = new Point(10, 103);
             labelSchema.Name = "labelSchema";
