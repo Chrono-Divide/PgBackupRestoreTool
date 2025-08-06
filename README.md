@@ -10,6 +10,7 @@
 - ♻️ **Restore** database from:
   - Custom format (`pg_restore`)
   - Plain SQL format (`psql`)
+  - Optional schema drop/clean before plain SQL restores
 - 🖱️ **Drag & drop** support: drop a file onto the Restore-file textbox to auto-populate the path
 - 🗜️ Improved status bar layout using `TableLayoutPanel` for consistent spacing
 - 🖥️ Local or remote host selection via connection‐string dropdown
@@ -33,6 +34,7 @@
 - Async connection testing to avoid UI freezing when listing databases
 - Concurrent stdout/stderr reading to prevent deadlocks on large `psql -l` output
 - `-w` flag automatically added to prevent blocking password prompts
+- Schema cleanup options disabled for custom-format restores to avoid confusion
 
 ## 🧑‍💻 How to Use
 
@@ -41,7 +43,7 @@
 ```bash
 git clone https://github.com/Chrono-Divide/PgBackupRestoreTool.git
 cd PgBackupRestoreTool
-````
+```
 
 ### 2. Build and Run
 
@@ -53,7 +55,7 @@ dotnet run --project PgBackupRestoreTool
 ```
 
 > To publish as a standalone executable:
->
+> 
 > ```bash
 > dotnet publish -c Release -r win-x64 --self-contained true
 > ```
